@@ -2,7 +2,7 @@ using SpineOpt
 
 run_spineopt(ARGS...)
 
-# The above uses the default solvers which are currently CLP for LP problems and Cbc for IP problems
+# The above uses the default solvers which are currently CLP for LP problems and Cbc for MIP problems
 # The below is an example for using the CPLEX solver. Other solvers follow a similar form
 #=
 using SpineOpt
