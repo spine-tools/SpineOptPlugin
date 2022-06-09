@@ -1,6 +1,6 @@
 {
     "name": "SpineOpt",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "base_path": "https://spine-project.github.io/SpineOptPlugin/",
     "description": "SpineOpt plugin for Spine Toolbox.",
     "specifications": {
@@ -14,6 +14,16 @@
                 "type": "path",
                 "relative": true,
                 "path": "specifications/Tool/load_template.json"
+            },
+            {
+                "type": "path",
+                "relative": true,
+                "path": "specifications/Tool/run_spineopt_detached.json"
+            },
+            {
+                "type": "path",
+                "relative": true,
+                "path": "specifications/Exporter/spineopt_to_table.json"
             }
         ]
     }

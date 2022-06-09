@@ -1,0 +1,97 @@
+{
+    "item_type": "Exporter",
+    "output_format": "Excel",
+    "name": "SpineOptToTable",
+    "description": "",
+    "mappings": {
+        "Mapping 1": {
+            "type": "relationship_parameter_values",
+            "mapping": [
+                {
+                    "map_type": "RelationshipClass",
+                    "position": "hidden",
+                    "filter_re": "unit|node|model"
+                },
+                {
+                    "map_type": "RelationshipClassObjectClass",
+                    "position": "header"
+                },
+                {
+                    "map_type": "RelationshipClassObjectClass",
+                    "position": "header"
+                },
+                {
+                    "map_type": "RelationshipClassObjectClass",
+                    "position": "header"
+                },
+                {
+                    "map_type": "RelationshipClassObjectClass",
+                    "position": "header"
+                },
+                {
+                    "map_type": "RelationshipClassObjectClass",
+                    "position": "hidden"
+                },
+                {
+                    "map_type": "ParameterDefinition",
+                    "position": -1,
+                    "filter_re": "unit_flow"
+                },
+                {
+                    "map_type": "ParameterValueList",
+                    "position": "hidden",
+                    "ignorable": true
+                },
+                {
+                    "map_type": "Relationship",
+                    "position": "hidden"
+                },
+                {
+                    "map_type": "RelationshipObject",
+                    "position": "hidden"
+                },
+                {
+                    "map_type": "RelationshipObject",
+                    "position": -2,
+                    "filter_re": "\"*caes*\""
+                },
+                {
+                    "map_type": "RelationshipObject",
+                    "position": -4
+                },
+                {
+                    "map_type": "RelationshipObject",
+                    "position": -3
+                },
+                {
+                    "map_type": "RelationshipObject",
+                    "position": "hidden"
+                },
+                {
+                    "map_type": "Alternative",
+                    "position": "table_name"
+                },
+                {
+                    "map_type": "ParameterValueType",
+                    "position": "hidden"
+                },
+                {
+                    "map_type": "IndexName",
+                    "position": "hidden"
+                },
+                {
+                    "map_type": "ParameterValueIndex",
+                    "position": 0
+                },
+                {
+                    "map_type": "ExpandedValue",
+                    "position": 2
+                }
+            ],
+            "enabled": true,
+            "always_export_header": true,
+            "group_fn": "one_or_none",
+            "use_fixed_table_name": false
+        }
+    }
+}
