@@ -19,7 +19,9 @@
                 "type": "path",
                 "relative": true,
                 "path": "specifications/Tool/run_spineopt_detached.json"
-            },
+            }
+        ],
+        "Exporter": [
             {
                 "type": "path",
                 "relative": true,
