@@ -17,6 +17,6 @@ try:
         'm=run_spineopt(raw"' + url_in + '",raw"' + url_out + '",write_as_roll=30)\n'
     )
     tfile.close()
-    Popen(["julia", "-i", filename, "--threads 2"], creationflags=CREATE_NEW_CONSOLE)
+    Popen(["julia", "-i", "-t 2", filename], creationflags=CREATE_NEW_CONSOLE)
 finally:
     print("done")
