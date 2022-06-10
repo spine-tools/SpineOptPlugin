@@ -2,7 +2,7 @@
     "name": "Run SpineOpt detached",
     "tooltype": "python",
     "includes": [
-        "run_spineopt_detached.jl"
+        "run_spineopt_detached.py"
     ],
     "description": "Runs SpineOpt in a new console.",
     "inputfiles": [],
