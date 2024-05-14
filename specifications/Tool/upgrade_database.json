@@ -1,0 +1,13 @@
+{
+    "name": "Upgrade database",
+    "tooltype": "julia",
+    "includes": [
+        "upgrade_database.jl"
+    ],
+    "description": "Upgrades database.",
+    "inputfiles": [],
+    "inputfiles_opt": [],
+    "outputfiles": [],
+    "cmdline_args": [],
+    "includes_main_path": "."
+}
