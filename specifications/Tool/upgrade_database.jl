@@ -298,6 +298,7 @@ function move_parameter_to_another_class_and_multiply(db_url, old_class_name, ol
 				"entity_byname" => (old_entity["name"],), "alternative_name" => alternative["name"])
 			)
 			if length(pval) > 0
+				parsed_value = parse_db_value(pval["value"], pval["type"])
 				# Get the new entities
 				new_entities = find_related_entities(db_url, new_class_name, old_entity, linking_dimension)
 				for new_entity in new_entities
@@ -321,8 +322,7 @@ function move_parameter_to_another_class_and_multiply(db_url, old_class_name, ol
 								catch
 									println("Warning: Could not create alternative $alternative_updated.")
 								end
-							end
-							parsed_value = parse_db_value(pval["value"], pval["type"])
+							end							
 							new_value = parsed_value * multiplier[2]
 							db_value, db_type = unparse_db_value(new_value)
 							# Add the new parameter value into the database
