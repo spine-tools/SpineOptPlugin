@@ -38,10 +38,18 @@ parameters_to_other_classes = [
 		[("unit__to_node", "shutdown_cost", 1), ("unit__from_node", "shutdown_cost", 1)]),
 	(("unit", "start_up_cost"), 
 		[("unit__to_node", "startup_cost", 1), ("unit__from_node", "startup_cost", 1)]),
-	(("unit", "unit_investment_cost"), 
-		[("unit__to_node", "investment_cost", 1), ("unit__from_node", "investment_cost", 1)]),
 	(("unit", "units_on_cost"), 
 		[("unit__to_node", "online_cost", 1), ("unit__from_node", "online_cost", 1)])
+]
+
+# (original class, original parameter name),
+# 	[(new class, new parameter name, linking dimension)],
+#	(multiplication type, [(multiplication parameter class, multiplication parameter name, linking dimension)])
+parameter_multiplications = [
+	(("unit", "unit_investment_cost"), 
+		[("unit__to_node", "investment_cost", 1), ("unit__from_node", "investment_cost", 1)],
+		("first", [("unit__to_node", "unit_capacity", 1), ("unit__from_node", "unit_capacity", 1)] )
+	)
 ]
 
 
@@ -89,7 +97,7 @@ function transform_parameter_to_map(db_url, class_name, old_par_name, new_par_na
 	catch
 		println("skipping add_parameter_definition_item")
 	end
-	# Compute new_pvals
+	# Compute new parameter values
 	entity_items = run_request(db_url, "call_method", ("get_entity_items",), Dict(
 		"entity_class_name" => class_name)
 	)
@@ -174,7 +182,7 @@ function move_parameter_to_another_class(db_url, old_class_name, old_par_name, n
 	catch
 		println("skipping add_parameter_definition_item")
 	end
-	# Compute new_pvals
+	# Compute new parameter values
 	old_entity_items = run_request(db_url, "call_method", ("get_entity_items",), Dict(
 		"entity_class_name" => old_class_name)
 	)
@@ -208,6 +216,133 @@ function move_parameter_to_another_class(db_url, old_class_name, old_par_name, n
 
 end
 
+# Go through the parameters, move to other classes while multiplying and commit session
+function move_parameters_to_other_classes_and_multiply(db_url, parameters_to_other_classes)
+	for (old_par_def, new_par_def, multiplication_def) in parameters_to_other_classes
+		for new_par_def_part in new_par_def
+			move_parameter_to_another_class_and_multiply(db_url, old_par_def[1], old_par_def[2], new_par_def_part[1], 
+				new_par_def_part[2], new_par_def_part[3], multiplication_def
+			)
+		end
+		# Remove old parameter definition
+		pdef = run_request(db_url, "call_method", ("get_parameter_definition_item",), Dict(
+			"entity_class_name" => old_par_def[1], "name" => old_par_def[2])
+		)
+		check_run_request_return_value(run_request(
+			db_url, "call_method", ("remove_parameter_definition_item", pdef["id"]))
+		)
+	end
+	run_request(db_url, "call_method", ("commit_session", "Move parameters to other classes while multiplying."))
+end
+
+# Find parameter values and move them into another class while multiplying
+function move_parameter_to_another_class_and_multiply(db_url, old_class_name, old_par_name, new_class_name, 
+	new_par_name, linking_dimension, multiplication_def
+)
+	# Add new parameter definition
+	try
+		check_run_request_return_value(run_request(db_url, "call_method", ("add_parameter_definition_item",), Dict(
+			"entity_class_name" => new_class_name, "name" => new_par_name))
+		)
+	catch
+		println("skipping add_parameter_definition_item")
+	end
+	# Compute new parameter values
+	old_entity_items = run_request(db_url, "call_method", ("get_entity_items",), Dict(
+		"entity_class_name" => old_class_name)
+	)
+	alternative_items = run_request(db_url, "call_method", ("get_alternative_items",))
+	for old_entity in old_entity_items
+		if multiplication_def[1] == "first"
+			multipliers = find_multiplier_first(db_url, old_entity, multiplication_def[2])
+		else
+			break
+		end
+		for alternative in alternative_items
+			# Get value of the old parameter
+			pval = run_request(db_url, "call_method", ("get_parameter_value_item",), Dict(
+				"entity_class_name" => old_class_name, "parameter_definition_name" => old_par_name,
+				"entity_byname" => (old_entity["name"],), "alternative_name" => alternative["name"])
+			)
+			if length(pval) > 0
+				# Get the new entities
+				new_entities = find_related_entities(db_url, new_class_name, old_entity, linking_dimension)
+				for new_entity in new_entities
+					# Find if (new_class_name, new_entity) in multipliers
+					if haskey(multipliers, (new_class_name, new_entity))
+						# Loop over alternatives in multipliers[(new_class_name, new_entity)]
+						for multiplier in multipliers[(new_class_name, new_entity)]
+							if multiplier[1] == alternative["name"]
+								alternative_updated = alternative["name"]
+							else
+								# Create a new alternative based on the two and add
+								alternative_updated = string(alternative["name"], "__", multiplier[1])
+								try
+									println("Warning: Creating a new alternative $alternative_updated, add manually to \
+										the scenarios.")
+									check_run_request_return_value(run_request(
+										db_url, "call_method", ("add_alternative_item",), Dict(
+											"name" => alternative_updated)
+										)
+									)
+								catch
+									println("Warning: Could not create alternative $alternative_updated.")
+								end
+							end
+							parsed_value = parse_db_value(pval["value"], pval["type"])
+							new_value = parsed_value * multiplier[2]
+							db_value, db_type = unparse_db_value(new_value)
+							# Add the new parameter value into the database
+							check_run_request_return_value(run_request(
+								db_url, "call_method", ("add_update_parameter_value_item",), Dict(
+									"entity_class_name" => new_class_name, 
+									"parameter_definition_name" => new_par_name, 
+									"entity_byname" => (new_entity["element_name_list"]), 
+									"alternative_name" => alternative_updated, 
+									"value" => db_value, 
+									"type" => db_type)
+								)
+							)
+						end
+					end
+				end
+			end
+		end
+	end
+end
+
+function find_multiplier_first(db_url, entity_item, multiplier_items)
+	multipliers = Dict()
+	alternative_items = run_request(db_url, "call_method", ("get_alternative_items",))
+	for alternative in alternative_items
+		multiplier_found = false
+		for multiplier_item in multiplier_items
+			related_entities = find_related_entities(db_url, multiplier_item[1], entity_item, multiplier_item[3])
+			for related_entity in related_entities
+				pval = run_request(db_url, "call_method", ("get_parameter_value_item",), Dict(
+					"entity_class_name" => multiplier_item[1], "parameter_definition_name" => multiplier_item[2],
+					"entity_byname" => (related_entity["element_name_list"]), "alternative_name" => alternative["name"])
+				)
+				if length(pval) > 0
+					parsed_value = parse_db_value(pval["value"], pval["type"])
+					if !haskey(multipliers, (multiplier_item[1], related_entity))
+						multipliers[(multiplier_item[1], related_entity)] = [(alternative["name"], 1 / parsed_value)]
+					else
+						push!(multipliers[(multiplier_item[1], related_entity)], (alternative["name"], 1 / parsed_value))
+					end
+					multiplier_found = true
+					break
+				end
+			end
+			if multiplier_found
+				break
+			end
+		end
+
+	end
+	return multipliers
+end
+
 # Find entities in class_name which have entity_item in the linking_dimension dimension
 function find_related_entities(db_url, class_name, entity_item, linking_dimension)
 	related_entities = Array{Any}(undef, 0)
@@ -235,6 +370,7 @@ function run_migrations()
 	rename_parameters(url_out, parameters_to_be_renamed)
 	transform_parameters_to_maps(url_out, parameters_to_maps)
 	move_parameters_to_other_classes(url_out, parameters_to_other_classes)
+	move_parameters_to_other_classes_and_multiply(url_out, parameter_multiplications)
 end
 
 url_in = ARGS[1]
@@ -242,4 +378,3 @@ url_out = ARGS[2]
 
 
 run_migrations()
-
