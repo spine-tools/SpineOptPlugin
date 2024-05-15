@@ -5,7 +5,12 @@ parameters_to_be_renamed = [
     (("unit", "number_of_units"), "existing_units"),
     (("unit", "unit_availability_factor"), "availability_factor"),
     (("unit", "unit_investment_lifetime"), "lifetime"),
-    (("unit", "unit_investment_variable_type"), "investment_method")
+    (("unit", "unit_investment_variable_type"), "investment_method"),
+
+	(("node", "balance_type"), "node_type"),
+	(("node", "frac_state_loss"), "storage_self_discharge"),
+	(("node", "state_coeff"), "storage_state_coeff"),
+	(("node", "storage_investment_lifetime"), "storage_lifetime")
 ]
 
 # (original class, original parameter name), (new parameter name, [map indexes of new parameter])
@@ -24,7 +29,33 @@ parameters_to_maps = [
 	# Unit mga
 	(("unit", "units_invested_big_m_mga"), ("mga", ["investment_big_m"])),
 	(("unit", "units_invested_mga"), ("mga", ["investment"])),
-	(("unit", "units_invested_mga_weight"), ("mga", ["investment_weight"]))
+	(("unit", "units_invested_mga_weight"), ("mga", ["investment_weight"])),
+
+	# Node investments
+	(("node", "candidate_storages"), ("storage_investment_limits", ["max_new"])),
+	(("node", "fix_storages_invested"), ("storage_investment_limits", ["fix_new"])),
+	(("node", "fix_storages_invested_available"), ("storage_investment_limits", ["fix_cumulative"])),
+	(("node", "initial_storages_invested"), ("storage_investment_limits", ["min_new"])),
+	(("node", "initial_storages_invested_available"), ("storage_investment_limits", ["min_cumulative"])),
+
+	# Node limits
+	(("node", "fix_node_pressure"), ("pressure_limits", ["fix"])),
+	(("node", "fix_node_state"), ("storage_state_limits", ["fix"])),
+	(("node", "fix_node_voltage_angle"), ("voltage_angle_limits", ["fix"])),
+	(("node", "initial_node_pressure"), ("pressure_limits", ["initial"])),
+	(("node", "initial_node_state"), ("storage_state_limits", ["initial"])),
+	(("node", "initial_node_voltage_angle"), ("voltage_angle_limits", ["initial"])),
+	(("node", "max_node_pressure"), ("pressure_limits", ["max"])),
+	(("node", "max_voltage_angle"), ("voltage_angle_limits", ["max"])),
+	(("node", "min_node_pressure"), ("pressure_limits", ["min"])),
+	(("node", "min_voltage_angle"), ("voltage_angle_limits", ["min"])),
+	(("node", "node_state_cap"), ("storage_state_limits", ["max"])),
+	(("node", "node_state_min"), ("storage_state_limits", ["min"])),
+
+	# Node mga
+	(("node", "storages_invested_big_m_mga"), ("storage_mga", ["investment_big_m"])),
+	(("node", "storages_invested_mga"), ("storage_mga", ["investment"])),
+	(("node", "storages_invested_mga_weight"), ("storage_mga", ["investment_weight"]))
 ]
 
 # (original class, original parameter name), [(new class, new parameter name, linking dimension)]
