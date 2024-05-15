@@ -68,9 +68,7 @@ parameters_to_other_classes = [
 	(("unit", "shut_down_cost"), 
 		[("unit__to_node", "shutdown_cost", 1), ("unit__from_node", "shutdown_cost", 1)]),
 	(("unit", "start_up_cost"), 
-		[("unit__to_node", "startup_cost", 1), ("unit__from_node", "startup_cost", 1)]),
-	(("unit", "units_on_cost"), 
-		[("unit__to_node", "online_cost", 1), ("unit__from_node", "online_cost", 1)])
+		[("unit__to_node", "startup_cost", 1), ("unit__from_node", "startup_cost", 1)])
 ]
 
 # (original class, original parameter name),
@@ -79,6 +77,10 @@ parameters_to_other_classes = [
 parameter_multiplications = [
 	(("unit", "unit_investment_cost"), 
 		[("unit__to_node", "investment_cost", 1), ("unit__from_node", "investment_cost", 1)],
+		("first", [("unit__to_node", "unit_capacity", 1), ("unit__from_node", "unit_capacity", 1)] )
+	),
+	(("unit", "units_on_cost"), 
+		[("unit__to_node", "online_cost", 1), ("unit__from_node", "online_cost", 1)],
 		("first", [("unit__to_node", "unit_capacity", 1), ("unit__from_node", "unit_capacity", 1)] )
 	)
 ]
