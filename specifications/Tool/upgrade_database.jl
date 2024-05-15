@@ -10,7 +10,12 @@ parameters_to_be_renamed = [
 	(("node", "balance_type"), "node_type"),
 	(("node", "frac_state_loss"), "storage_self_discharge"),
 	(("node", "state_coeff"), "storage_state_coeff"),
-	(("node", "storage_investment_lifetime"), "storage_lifetime")
+	(("node", "storage_investment_lifetime"), "storage_lifetime"),
+
+    (("connection", "connection_availability_factor"), "availability_factor"),
+    (("connection", "connection_investment_lifetime"), "lifetime"),
+    (("connection", "connection_reactance"), "reactance"),
+    (("connection", "connection_resistance"), "resistance")
 ]
 
 # (original class, original parameter name), (new parameter name, [map indexes of new parameter])
@@ -55,7 +60,19 @@ parameters_to_maps = [
 	# Node mga
 	(("node", "storages_invested_big_m_mga"), ("storage_mga", ["investment_big_m"])),
 	(("node", "storages_invested_mga"), ("storage_mga", ["investment"])),
-	(("node", "storages_invested_mga_weight"), ("storage_mga", ["investment_weight"]))
+	(("node", "storages_invested_mga_weight"), ("storage_mga", ["investment_weight"])),
+
+	# Connection investments
+	(("connection", "candidate_connections"), ("investment_limits", ["max_new"])),
+	(("connection", "fix_connections_invested"), ("investment_limits", ["fix_new"])),
+	(("connection", "fix_connections_invested_available"), ("investment_limits", ["fix_cumulative"])),
+	(("connection", "initial_connections_invested"), ("investment_limits", ["min_new"])),
+	(("connection", "initial_connections_invested_available"), ("investment_limits", ["min_cumulative"])),
+
+	# Connection mga
+	(("connection", "connections_invested_big_m_mga"), ("mga", ["investment_big_m"])),
+	(("connection", "connections_invested_mga"), ("mga", ["investment"])),
+	(("connection", "connections_invested_mga_weight"), ("mga", ["investment_weight"]))
 ]
 
 # (original class, original parameter name), [(new class, new parameter name, linking dimension)]
