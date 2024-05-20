@@ -1,21 +1,29 @@
 using SpineInterface
 
-# (original class, original parameter name), new parameter name
+# (original class, original parameter name), new parameter name, merge method("sum")
 parameters_to_be_renamed = [
-    (("unit", "number_of_units"), "existing_units"),
-    (("unit", "unit_availability_factor"), "availability_factor"),
-    (("unit", "unit_investment_lifetime"), "lifetime"),
-    (("unit", "unit_investment_variable_type"), "investment_method"),
+    (("unit", "number_of_units"), "existing_units", ""),
+    (("unit", "unit_availability_factor"), "availability_factor", ""),
+    (("unit", "unit_investment_lifetime"), "lifetime", ""),
+    (("unit", "unit_investment_variable_type"), "investment_method", ""),
 
-	(("node", "balance_type"), "node_type"),
-	(("node", "frac_state_loss"), "storage_self_discharge"),
-	(("node", "state_coeff"), "storage_state_coeff"),
-	(("node", "storage_investment_lifetime"), "storage_lifetime"),
+	(("node", "balance_type"), "node_type", ""),
+	(("node", "frac_state_loss"), "storage_self_discharge", ""),
+	(("node", "state_coeff"), "storage_state_coeff", ""),
+	(("node", "storage_investment_lifetime"), "storage_lifetime", ""),
 
-    (("connection", "connection_availability_factor"), "availability_factor"),
-    (("connection", "connection_investment_lifetime"), "lifetime"),
-    (("connection", "connection_reactance"), "reactance"),
-    (("connection", "connection_resistance"), "resistance")
+    (("connection", "connection_availability_factor"), "availability_factor", ""),
+    (("connection", "connection_investment_lifetime"), "lifetime", ""),
+    (("connection", "connection_reactance"), "reactance", ""),
+    (("connection", "connection_resistance"), "resistance", ""),
+
+	(("unit__to_node", "unit_capacity"), "capacity_per_unit", ""),
+	(("unit__to_node", "vom_cost"), "flow_cost", ""),
+	(("unit__from_node", "unit_capacity"), "capacity_per_unit", ""),
+	(("unit__from_node", "vom_cost"), "flow_cost", ""),
+
+	(("unit__to_node", "fuel_cost"), "flow_cost", "sum"),
+	(("unit__from_node", "fuel_cost"), "flow_cost", "sum")	
 ]
 
 # (original class, original parameter name), (new parameter name, [map indexes of new parameter])
@@ -72,7 +80,30 @@ parameters_to_maps = [
 	# Connection mga
 	(("connection", "connections_invested_big_m_mga"), ("mga", ["investment_big_m"])),
 	(("connection", "connections_invested_mga"), ("mga", ["investment"])),
-	(("connection", "connections_invested_mga_weight"), ("mga", ["investment_weight"]))
+	(("connection", "connections_invested_mga_weight"), ("mga", ["investment_weight"])),
+
+	# Unit__to_node
+	(("unit__to_node", "fix_unit_flow"), ("flow_limits", ["fix"])),
+	(("unit__to_node", "initial_unit_flow"), ("flow_limits", ["initial"])),
+	(("unit__to_node", "max_total_cumulated_unit_flow_to_node"), ("flow_limits", ["max_cumulative"])),
+	(("unit__to_node", "min_total_cumulated_unit_flow_to_node"), ("flow_limits", ["min_cumulative"])),
+	(("unit__to_node", "min_unit_flow"), ("flow_limits", ["min"])),
+	(("unit__to_node", "ramp_down_limit"), ("ramp_limits", ["ramp_down"])),
+	(("unit__to_node", "ramp_up_limit"), ("ramp_limits", ["ramp_up"])),
+	(("unit__to_node", "shut_down_limit"), ("ramp_limits", ["shutdown"])),
+	(("unit__to_node", "start_up_limit"), ("ramp_limits", ["startup"])),
+
+	# Unit__from_node
+	(("unit__from_node", "fix_unit_flow"), ("flow_limits", ["fix"])),
+	(("unit__from_node", "initial_unit_flow"), ("flow_limits", ["initial"])),
+	(("unit__from_node", "max_total_cumulated_unit_flow_from_node"), ("flow_limits", ["max_cumulative"])),
+	(("unit__from_node", "min_total_cumulated_unit_flow_from_node"), ("flow_limits", ["min_cumulative"])),
+	(("unit__from_node", "min_unit_flow"), ("flow_limits", ["min"])),
+	(("unit__from_node", "ramp_down_limit"), ("ramp_limits", ["ramp_down"])),
+	(("unit__from_node", "ramp_up_limit"), ("ramp_limits", ["ramp_up"])),
+	(("unit__from_node", "shut_down_limit"), ("ramp_limits", ["shutdown"])),
+	(("unit__from_node", "start_up_limit"), ("ramp_limits", ["startup"])),
+
 ]
 
 # (original class, original parameter name), [(new class, new parameter name, linking dimension)]
@@ -86,6 +117,7 @@ parameters_to_other_classes = [
 		[("unit__to_node", "shutdown_cost", 1), ("unit__from_node", "shutdown_cost", 1)]),
 	(("unit", "start_up_cost"), 
 		[("unit__to_node", "startup_cost", 1), ("unit__from_node", "startup_cost", 1)])
+
 ]
 
 # (original class, original parameter name),
@@ -112,22 +144,126 @@ end
 
 # Go through the parameters, rename them and commit session
 function rename_parameters(db_url, parameters_to_be_renamed)
-	for (old_par_def, new_par_name) in parameters_to_be_renamed
-		rename_parameter(db_url, old_par_def[1], old_par_def[2], new_par_name)
+	for (old_par_def, new_par_name, merge_method) in parameters_to_be_renamed
+		rename_parameter(db_url, old_par_def[1], old_par_def[2], new_par_name, merge_method)
 	end
 	run_request(db_url, "call_method", ("commit_session", "Rename parameters."))
 end
 
 # Find the parameter id and rename the parameter
-function rename_parameter(db_url, class_name, old_par_name, new_par_name)
+function rename_parameter(db_url, class_name, old_par_name, new_par_name, merge_method)
 	pdef = run_request(db_url, "call_method", ("get_item", "parameter_definition"), Dict(
 		"entity_class_name" => class_name, "name" => old_par_name)
 	)
-	check_run_request_return_value(run_request(db_url, "call_method", ("update_item", "parameter_definition"), Dict(
-		"id" => pdef["id"], "name" => new_par_name))
-	)
+	try
+		check_run_request_return_value(run_request(db_url, "call_method", ("update_item", "parameter_definition"), Dict(
+			"id" => pdef["id"], "name" => new_par_name))
+		)
+	catch
+		if merge_method == "sum"
+			sum_to_existing_parameter(db_url, class_name, old_par_name, new_par_name)
+		end
+		# Remove old parameter definition
+		pdef = run_request(db_url, "call_method", ("get_parameter_definition_item",), Dict(
+			"entity_class_name" => class_name, "name" => old_par_name)
+		)
+		check_run_request_return_value(run_request(
+			db_url, "call_method", ("remove_parameter_definition_item", pdef["id"]))
+		)
+	end
 end
 
+# Sum old_par_name values to new_par_name values
+function sum_to_existing_parameter(db_url, class_name, old_par_name, new_par_name)
+	entity_items = run_request(db_url, "call_method", ("get_entity_items",), Dict(
+		"entity_class_name" => class_name)
+	)
+	alternative_items = run_request(db_url, "call_method", ("get_alternative_items",))
+	for entity in entity_items
+		# Find existing parameters in all alternatives
+		existing_values = find_existing_values(db_url, entity, class_name, new_par_name)
+		for alternative in alternative_items
+			# Get value of the old parameter
+			pval = run_request(db_url, "call_method", ("get_parameter_value_item",), Dict(
+				"entity_class_name" => class_name, "parameter_definition_name" => old_par_name, 
+				"entity_byname" => (entity["element_name_list"]), "alternative_name" => alternative["name"])
+			)
+			if length(pval) > 0
+				parsed_pval = parse_db_value(pval["value"], pval["type"])
+				base_alternative_added = false
+				# Find if entity in existing_values
+				if haskey(existing_values, entity)
+					summed_parsed_pval = parsed_pval
+					# Loop over alternatives in existing_values[entity]
+					for existing_value in existing_values[entity]
+						if existing_value[1] == alternative["name"]
+							alternative_updated = alternative["name"]
+							base_alternative_added = true
+						else
+							# Create a new alternative based on the two and add
+							alternative_updated = string(alternative["name"], "__", existing_value[1])
+							try
+								println("Warning: Creating a new alternative $alternative_updated, add manually to \
+									the scenarios.")
+								check_run_request_return_value(run_request(
+									db_url, "call_method", ("add_alternative_item",), Dict(
+										"name" => alternative_updated)
+									)
+								)
+							catch
+								println("Warning: Could not create alternative $alternative_updated.")
+							end
+						end							
+						summed_parsed_pval += existing_value[2]
+						summed_pval_value, summed_pval_type = unparse_db_value(summed_parsed_pval)
+						# Add the new parameter value into the database
+						check_run_request_return_value(run_request(
+							db_url, "call_method", ("add_update_parameter_value_item",), Dict(
+								"entity_class_name" => class_name, "parameter_definition_name" => new_par_name, 
+								"entity_byname" => (entity["element_name_list"]), 
+								"alternative_name" => alternative_updated, 	
+								"value" => summed_pval_value, "type" => summed_pval_type)
+							)
+						)
+					end
+				end
+				pval_value2, pval_type2 = unparse_db_value(parsed_pval)
+				if !base_alternative_added
+					# Add the new parameter value into the database
+					check_run_request_return_value(run_request(
+						db_url, "call_method", ("add_update_parameter_value_item",), Dict(
+							"entity_class_name" => class_name, "parameter_definition_name" => new_par_name, 
+							"entity_byname" => (entity["element_name_list"]), "alternative_name" => alternative["name"], 
+							"value" => pval_value2, "type" => pval_type2)
+						)
+					)
+				end						
+			end
+		end
+	end
+end
+
+# Find existing parameter_name values of entity in all alternatives
+function find_existing_values(db_url, entity, class_name, parameter_name)
+	existing_values = Dict()
+	alternative_items = run_request(db_url, "call_method", ("get_alternative_items",))
+	for alternative in alternative_items
+		pval = run_request(db_url, "call_method", ("get_parameter_value_item",), Dict(
+			"entity_class_name" => class_name, "parameter_definition_name" => parameter_name,
+			"entity_byname" => (entity["element_name_list"]), "alternative_name" => alternative["name"])
+		)
+		if length(pval) > 0
+			parsed_value = parse_db_value(pval["value"], pval["type"])
+			if !haskey(existing_values, entity)
+				existing_values[entity] = [(alternative["name"], parsed_value)]
+			else
+				push!(existing_values[entity], (alternative["name"], parsed_value))
+			end
+			break
+		end
+	end
+	return existing_values
+end
 
 # Go through the parameters, convert to a Map parameter and commit session
 function transform_parameters_to_maps(db_url, parameters_to_maps)
