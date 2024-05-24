@@ -361,7 +361,6 @@ function transform_parameter_to_map(db_url, class_name, old_par_name, new_par_na
 			"entity_class_name" => class_name, "name" => new_par_name))
 		)
 	catch
-		println("skipping add_parameter_definition_item")
 	end
 	# Compute new parameter values
 	entity_items = run_request(db_url, "call_method", ("get_entity_items",), Dict(
@@ -446,7 +445,6 @@ function move_parameter_to_another_class(db_url, old_class_name, old_par_name, n
 			"entity_class_name" => new_class_name, "name" => new_par_name))
 		)
 	catch
-		println("skipping add_parameter_definition_item")
 	end
 	# Compute new parameter values
 	old_entity_items = run_request(db_url, "call_method", ("get_entity_items",), Dict(
@@ -512,7 +510,6 @@ function move_parameter_to_another_class_and_multiply(db_url, old_class_name, ol
 			"entity_class_name" => new_class_name, "name" => new_par_name))
 		)
 	catch
-		println("skipping add_parameter_definition_item")
 	end
 	# Compute new parameter values
 	old_entity_items = run_request(db_url, "call_method", ("get_entity_items",), Dict(
@@ -652,7 +649,6 @@ function move_parameter_to_multidimensional_class(db_url, old_class_name, old_pa
 			"entity_class_name" => new_class_name, "name" => new_par_name))
 		)
 	catch
-		println("skipping add_parameter_definition_item")
 	end
 	# Compute new parameter values
 	old_entity_items = run_request(db_url, "call_method", ("get_entity_items",), Dict(
@@ -713,7 +709,6 @@ function update_ordering_of_multidimensional_class(db_url, old_class, new_class,
 			"name" => new_class, "dimension_name_list" => dimensions))
 		)
 	catch
-		println("skipping add_entity_class_item")
 	end
 	try
 		# Get entities, alternatives and parameter definitions
@@ -818,9 +813,11 @@ function create_superclasses_and_subclasses(db_url)
 end
 
 # Always check the last item
-function check_run_request_return_value(value_to_be_checked)
+function check_run_request_return_value(value_to_be_checked, print_value=false)
 	if value_to_be_checked[end] != nothing && value_to_be_checked[end] != ""
-		println(value_to_be_checked[end])
+		if print_value
+			println(value_to_be_checked[end])
+		end
 		throw(error())
 	end
 end
