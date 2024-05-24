@@ -23,7 +23,14 @@ parameters_to_be_renamed = [
 	(("node__to_unit", "vom_cost"), "flow_cost", ""),
 
 	(("unit__to_node", "fuel_cost"), "flow_cost", "sum"),
-	(("node__to_unit", "fuel_cost"), "flow_cost", "sum")	
+	(("node__to_unit", "fuel_cost"), "flow_cost", "sum"),
+	
+	(("temporal_block", "representative_periods_mapping"), "periods_represented", ""),
+
+	(("model", "db_lp_solver"), "lp_solver", ""),
+	(("model", "db_lp_solver_options"), "lp_solver_options", ""),
+	(("model", "db_mip_solver"), "mip_solver", ""),
+	(("model", "db_mip_solver_options"), "mip_solver_options", ""),
 ]
 
 # (original class, original parameter name), (new parameter name, [map indexes of new parameter])
@@ -104,6 +111,12 @@ parameters_to_maps = [
 	(("node__to_unit", "shut_down_limit"), ("ramp_limits", ["shutdown"])),
 	(("node__to_unit", "start_up_limit"), ("ramp_limits", ["startup"])),
 
+	# model
+	(("model", "max_gap"), ("decomposition", ["max_gap"])),
+	(("model", "max_iterations"), ("decomposition", ["max_iterations"])),
+	(("model", "max_mga_iterations"), ("mga", ["max_iterations"])),
+	(("model", "max_mga_slack"), ("mga", ["max_slack"])),
+	(("model", "min_iterations"), ("decomposition", ["min_iterations"])),
 ]
 
 # (original class, original parameter name), [(new class, new parameter name, linking dimension)]
@@ -192,6 +205,11 @@ parameters_to_multidimensional_classes = [
 # (original class, new class, dimensions, mapping of dimensions)
 classes_to_be_updated = [
 	("unit__from_node", "node__to_unit", ["node", "unit"], [2, 1])
+]
+
+# original class
+classes_to_be_removed = [
+	"unit__node__node"
 ]
 
 
@@ -750,6 +768,22 @@ function update_ordering_of_multidimensional_class(db_url, old_class, new_class,
 	end
 end
 
+function remove_classes(db_url, classes_to_be_removed)
+	for class_name in classes_to_be_removed
+		try
+			entity_class = run_request(db_url, "call_method", ("get_entity_class_item",), Dict(
+				"name" => class_name)
+			)
+			check_run_request_return_value(run_request(
+				db_url, "call_method", ("remove_entity_class_item", entity_class["id"]))
+			)
+		catch
+			println("Could not remove class $class_name.")
+		end
+	end
+	run_request(db_url, "call_method", ("commit_session", "Remove classes."))
+end
+
 function create_superclasses_and_subclasses(db_url)
 	# Add new classes
 	try
@@ -780,6 +814,7 @@ function create_superclasses_and_subclasses(db_url)
 	catch
 		println("Could not add superclasses and subclasses.")
 	end
+	run_request(db_url, "call_method", ("commit_session", "Add superclasses and subclasses."))
 end
 
 # Always check the last item
@@ -799,6 +834,7 @@ function run_migrations()
 	move_parameters_to_other_classes(url_out, parameters_to_other_classes)
 	move_parameters_to_other_classes_and_multiply(url_out, parameter_multiplications)
 	move_parameters_to_multidimensional_classes(url_out, parameters_to_multidimensional_classes)
+	remove_classes(url_out, classes_to_be_removed)
 end
 
 url_in = ARGS[1]
