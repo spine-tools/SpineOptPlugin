@@ -19,11 +19,11 @@ parameters_to_be_renamed = [
 
 	(("unit__to_node", "unit_capacity"), "capacity_per_unit", ""),
 	(("unit__to_node", "vom_cost"), "flow_cost", ""),
-	(("unit__from_node", "unit_capacity"), "capacity_per_unit", ""),
-	(("unit__from_node", "vom_cost"), "flow_cost", ""),
+	(("node__to_unit", "unit_capacity"), "capacity_per_unit", ""),
+	(("node__to_unit", "vom_cost"), "flow_cost", ""),
 
 	(("unit__to_node", "fuel_cost"), "flow_cost", "sum"),
-	(("unit__from_node", "fuel_cost"), "flow_cost", "sum")	
+	(("node__to_unit", "fuel_cost"), "flow_cost", "sum")	
 ]
 
 # (original class, original parameter name), (new parameter name, [map indexes of new parameter])
@@ -93,30 +93,30 @@ parameters_to_maps = [
 	(("unit__to_node", "shut_down_limit"), ("ramp_limits", ["shutdown"])),
 	(("unit__to_node", "start_up_limit"), ("ramp_limits", ["startup"])),
 
-	# Unit__from_node
-	(("unit__from_node", "fix_unit_flow"), ("flow_limits", ["fix"])),
-	(("unit__from_node", "initial_unit_flow"), ("flow_limits", ["initial"])),
-	(("unit__from_node", "max_total_cumulated_unit_flow_from_node"), ("flow_limits", ["max_cumulative"])),
-	(("unit__from_node", "min_total_cumulated_unit_flow_from_node"), ("flow_limits", ["min_cumulative"])),
-	(("unit__from_node", "min_unit_flow"), ("flow_limits", ["min"])),
-	(("unit__from_node", "ramp_down_limit"), ("ramp_limits", ["ramp_down"])),
-	(("unit__from_node", "ramp_up_limit"), ("ramp_limits", ["ramp_up"])),
-	(("unit__from_node", "shut_down_limit"), ("ramp_limits", ["shutdown"])),
-	(("unit__from_node", "start_up_limit"), ("ramp_limits", ["startup"])),
+	# node__to_unit
+	(("node__to_unit", "fix_unit_flow"), ("flow_limits", ["fix"])),
+	(("node__to_unit", "initial_unit_flow"), ("flow_limits", ["initial"])),
+	(("node__to_unit", "max_total_cumulated_unit_flow_from_node"), ("flow_limits", ["max_cumulative"])),
+	(("node__to_unit", "min_total_cumulated_unit_flow_from_node"), ("flow_limits", ["min_cumulative"])),
+	(("node__to_unit", "min_unit_flow"), ("flow_limits", ["min"])),
+	(("node__to_unit", "ramp_down_limit"), ("ramp_limits", ["ramp_down"])),
+	(("node__to_unit", "ramp_up_limit"), ("ramp_limits", ["ramp_up"])),
+	(("node__to_unit", "shut_down_limit"), ("ramp_limits", ["shutdown"])),
+	(("node__to_unit", "start_up_limit"), ("ramp_limits", ["startup"])),
 
 ]
 
 # (original class, original parameter name), [(new class, new parameter name, linking dimension)]
 parameters_to_other_classes = [
-	# Unit --> unit__to_node / unit__from_node
+	# Unit --> unit__to_node / node__to_unit
 	(("unit", "curtailment_cost"), 
-		[("unit__to_node", "curtailment_cost", 1), ("unit__from_node", "curtailment_cost", 1)]),
+		[("unit__to_node", "curtailment_cost", 1), ("node__to_unit", "curtailment_cost", 2)]),
 	(("unit", "fom_cost"), 
-		[("unit__to_node", "fixed_annual_cost", 1), ("unit__from_node", "fixed_annual_cost", 1)]),
+		[("unit__to_node", "fixed_annual_cost", 1), ("node__to_unit", "fixed_annual_cost", 2)]),
 	(("unit", "shut_down_cost"), 
-		[("unit__to_node", "shutdown_cost", 1), ("unit__from_node", "shutdown_cost", 1)]),
+		[("unit__to_node", "shutdown_cost", 1), ("node__to_unit", "shutdown_cost", 2)]),
 	(("unit", "start_up_cost"), 
-		[("unit__to_node", "startup_cost", 1), ("unit__from_node", "startup_cost", 1)])
+		[("unit__to_node", "startup_cost", 1), ("node__to_unit", "startup_cost", 2)])
 
 ]
 
@@ -125,14 +125,76 @@ parameters_to_other_classes = [
 #	(multiplication type, [(multiplication parameter class, multiplication parameter name, linking dimension)])
 parameter_multiplications = [
 	(("unit", "unit_investment_cost"), 
-		[("unit__to_node", "investment_cost", 1), ("unit__from_node", "investment_cost", 1)],
-		("first", [("unit__to_node", "unit_capacity", 1), ("unit__from_node", "unit_capacity", 1)] )
+		[("unit__to_node", "investment_cost", 1), ("node__to_unit", "investment_cost", 2)],
+		("first", [("unit__to_node", "unit_capacity", 1), ("node__to_unit", "unit_capacity", 2)] )
 	),
 	(("unit", "units_on_cost"), 
-		[("unit__to_node", "online_cost", 1), ("unit__from_node", "online_cost", 1)],
-		("first", [("unit__to_node", "unit_capacity", 1), ("unit__from_node", "unit_capacity", 1)] )
+		[("unit__to_node", "online_cost", 1), ("node__to_unit", "online_cost", 2)],
+		("first", [("unit__to_node", "unit_capacity", 1), ("node__to_unit", "unit_capacity", 2)] )
 	)
 ]
+
+# (original class, original parameter name), (new class, list of dimensions, new parameter name, mapping of dimensions)
+parameters_to_multidimensional_classes = [
+	# Unit__node1__node2 --> unit__node1, unit__node2 ratios
+	(("unit__node__node", "fix_ratio_out_in_unit_flow"), 
+		("unit_flow__unit_flow", ["unit__to_node", "node__to_unit"], "equality_constraint", [1, 2, 3, 1])),
+	(("unit__node__node", "fix_ratio_in_out_unit_flow"), 
+		("unit_flow__unit_flow", ["node__to_unit", "unit__to_node"], "equality_constraint", [2, 1, 1, 3])),
+	(("unit__node__node", "fix_ratio_in_in_unit_flow"), 
+		("unit_flow__unit_flow", ["node__to_unit", "node__to_unit"], "equality_constraint", [2, 1, 3, 1])),
+	(("unit__node__node", "fix_ratio_out_out_unit_flow"), 
+		("unit_flow__unit_flow", ["unit__to_node", "unit__to_node"], "equality_constraint", [1, 2, 1, 3])),
+	(("unit__node__node", "min_ratio_out_in_unit_flow"), 
+		("unit_flow__unit_flow", ["unit__to_node", "node__to_unit"], "less_than_constraint", [1, 2, 3, 1])),
+	(("unit__node__node", "min_ratio_in_out_unit_flow"), 
+		("unit_flow__unit_flow", ["node__to_unit", "unit__to_node"], "less_than_constraint", [2, 1, 1, 3])),
+	(("unit__node__node", "min_ratio_in_in_unit_flow"), 
+		("unit_flow__unit_flow", ["node__to_unit", "node__to_unit"], "less_than_constraint", [2, 1, 3, 1])),
+	(("unit__node__node", "min_ratio_out_out_unit_flow"), 
+		("unit_flow__unit_flow", ["unit__to_node", "unit__to_node"], "less_than_constraint", [1, 2, 1, 3])),
+	(("unit__node__node", "max_ratio_out_in_unit_flow"), 
+		("unit_flow__unit_flow", ["unit__to_node", "node__to_unit"], "greater_than_constraint", [1, 2, 3, 1])),
+	(("unit__node__node", "max_ratio_in_out_unit_flow"), 
+		("unit_flow__unit_flow", ["node__to_unit", "unit__to_node"], "greater_than_constraint", [2, 1, 1, 3])),
+	(("unit__node__node", "max_ratio_in_in_unit_flow"), 
+		("unit_flow__unit_flow", ["node__to_unit", "node__to_unit"], "greater_than_constraint", [2, 1, 3, 1])),
+	(("unit__node__node", "max_ratio_out_out_unit_flow"), 
+		("unit_flow__unit_flow", ["unit__to_node", "unit__to_node"], "greater_than_constraint", [1, 2, 1, 3])),
+
+	# Unit__node1__node2 --> unit__node1, unit__node2 coefficients
+	(("unit__node__node", "fix_units_on_coefficient_out_in"), 
+		("unit_flow__unit_flow", ["unit__to_node", "node__to_unit"], "equality_constant", [1, 2, 3, 1])),
+	(("unit__node__node", "fix_units_on_coefficient_in_out"), 
+		("unit_flow__unit_flow", ["node__to_unit", "unit__to_node"], "equality_constant", [2, 1, 1, 3])),
+	(("unit__node__node", "fix_units_on_coefficient_in_in"), 
+		("unit_flow__unit_flow", ["node__to_unit", "node__to_unit"], "equality_constant", [2, 1, 3, 1])),
+	(("unit__node__node", "fix_units_on_coefficient_out_out"), 
+		("unit_flow__unit_flow", ["unit__to_node", "unit__to_node"], "equality_constant", [1, 2, 1, 3])),
+	(("unit__node__node", "min_units_on_coefficient_out_in"), 
+		("unit_flow__unit_flow", ["unit__to_node", "node__to_unit"], "less_than_constant", [1, 2, 3, 1])),
+	(("unit__node__node", "min_units_on_coefficient_in_out"), 
+		("unit_flow__unit_flow", ["node__to_unit", "unit__to_node"], "less_than_constant", [2, 1, 1, 3])),
+	(("unit__node__node", "min_units_on_coefficient_in_in"), 
+		("unit_flow__unit_flow", ["node__to_unit", "node__to_unit"], "less_than_constant", [2, 1, 3, 1])),
+	(("unit__node__node", "min_units_on_coefficient_out_out"), 
+		("unit_flow__unit_flow", ["unit__to_node", "unit__to_node"], "less_than_constant", [1, 2, 1, 3])),
+	(("unit__node__node", "max_units_on_coefficient_out_in"), 
+		("unit_flow__unit_flow", ["unit__to_node", "node__to_unit"], "greater_than_constant", [1, 2, 3, 1])),
+	(("unit__node__node", "max_units_on_coefficient_in_out"), 
+		("unit_flow__unit_flow", ["node__to_unit", "unit__to_node"], "greater_than_constant", [2, 1, 1, 3])),
+	(("unit__node__node", "max_units_on_coefficient_in_in"), 
+		("unit_flow__unit_flow", ["node__to_unit", "node__to_unit"], "greater_than_constant", [2, 1, 3, 1])),
+	(("unit__node__node", "max_units_on_coefficient_out_out"), 
+		("unit_flow__unit_flow", ["unit__to_node", "unit__to_node"], "greater_than_constant", [1, 2, 1, 3]))
+]
+
+# (original class, new class, dimensions, mapping of dimensions)
+classes_to_be_updated = [
+	("unit__from_node", "node__to_unit", ["node", "unit"], [2, 1])
+]
+
+
 
 
 # Copy the db from url_in to url_out
@@ -402,6 +464,7 @@ function move_parameter_to_another_class(db_url, old_class_name, old_par_name, n
 
 end
 
+
 # Go through the parameters, move to other classes while multiplying and commit session
 function move_parameters_to_other_classes_and_multiply(db_url, parameters_to_other_classes)
 	for (old_par_def, new_par_def, multiplication_def) in parameters_to_other_classes
@@ -473,7 +536,8 @@ function move_parameter_to_another_class_and_multiply(db_url, old_class_name, ol
 										)
 									)
 								catch
-									println("Warning: Could not create alternative $alternative_updated.")
+									println("Warning: Could not create alternative $alternative_updated, alternative \
+										already exists.")
 								end
 							end							
 							new_value = parsed_value * multiplier[2]
@@ -543,6 +607,181 @@ function find_related_entities(db_url, class_name, entity_item, linking_dimensio
 	return related_entities
 end
 
+# Go through the parameters, move to other classes depending on dimension list and commit session
+function move_parameters_to_multidimensional_classes(db_url, parameters_to_multidimensional_classes)
+	for (old_par_def, new_par_def) in parameters_to_multidimensional_classes
+		move_parameter_to_multidimensional_class(db_url, old_par_def[1], old_par_def[2], new_par_def[1], 
+			new_par_def[2], new_par_def[3], new_par_def[4]
+		)
+		# Remove old parameter definition
+		pdef = run_request(db_url, "call_method", ("get_parameter_definition_item",), Dict(
+			"entity_class_name" => old_par_def[1], "name" => old_par_def[2])
+		)
+		check_run_request_return_value(run_request(
+			db_url, "call_method", ("remove_parameter_definition_item", pdef["id"]))
+		)
+	end
+	run_request(db_url, "call_method", ("commit_session", "Move parameters to other classes."))
+end
+
+# Find parameter values and move them into another class
+function move_parameter_to_multidimensional_class(db_url, old_class_name, old_par_name, new_class_name, 
+	dimension_name_list, new_par_name, mapping
+)
+	# Add new parameter definition
+	try
+		check_run_request_return_value(run_request(db_url, "call_method", ("add_parameter_definition_item",), Dict(
+			"entity_class_name" => new_class_name, "name" => new_par_name))
+		)
+	catch
+		println("skipping add_parameter_definition_item")
+	end
+	# Compute new parameter values
+	old_entity_items = run_request(db_url, "call_method", ("get_entity_items",), Dict(
+		"entity_class_name" => old_class_name)
+	)
+	alternative_items = run_request(db_url, "call_method", ("get_alternative_items",))
+	for old_entity in old_entity_items
+		for alternative in alternative_items
+			# Get value of the old parameter
+			pval = run_request(db_url, "call_method", ("get_parameter_value_item",), Dict(
+				"entity_class_name" => old_class_name, "parameter_definition_name" => old_par_name,
+				"entity_byname" => (old_entity["element_name_list"]), "alternative_name" => alternative["name"])
+			)
+			if length(pval) > 0
+				# Determine element name list
+				new_element_name_list = [old_entity["element_name_list"][i] for i in mapping]
+				# Add the entity into the database
+				check_run_request_return_value(run_request(
+					db_url, "call_method", ("add_entity_item",), Dict(
+						"entity_class_name" => new_class_name, 
+						"entity_byname" => (new_element_name_list),
+						"description" => old_entity["description"])
+					)
+				)
+				# Add the new parameter value into the database
+				check_run_request_return_value(run_request(
+					db_url, "call_method", ("add_update_parameter_value_item",), Dict(
+						"entity_class_name" => new_class_name, 
+						"parameter_definition_name" => new_par_name, 
+						"entity_byname" => (new_element_name_list), 
+						"alternative_name" => alternative["name"], 
+						"value" => pval["value"], 
+						"type" => pval["type"])
+					)
+				)
+			end
+		end
+	end
+
+end
+
+function update_ordering_of_multidimensional_classes(db_url, classes_to_be_updated)
+	for (old_class, new_class, dimensions, mapping) in classes_to_be_updated
+		update_ordering_of_multidimensional_class(db_url, old_class, new_class, dimensions, mapping)
+		# Remove old class
+		class_item = run_request(db_url, "call_method", ("get_entity_class_item",), Dict("name" => old_class))
+		check_run_request_return_value(run_request(
+			db_url, "call_method", ("remove_entity_class_item", class_item["id"]))
+		)
+	end
+	run_request(db_url, "call_method", ("commit_session", "Update classes."))
+end
+
+function update_ordering_of_multidimensional_class(db_url, old_class, new_class, dimensions, mapping)
+	try
+		# Create new class
+		check_run_request_return_value(run_request(db_url, "call_method", ("add_entity_class_item",), Dict(
+			"name" => new_class, "dimension_name_list" => dimensions))
+		)
+	catch
+		println("skipping add_entity_class_item")
+	end
+	try
+		# Get entities, alternatives and parameter definitions
+		entity_items = run_request(db_url, "call_method", ("get_entity_items",), Dict("entity_class_name" => old_class))
+		alternatives = run_request(db_url, "call_method", ("get_alternative_items",))
+		pdefs = run_request(db_url, "call_method", ("get_parameter_definition_items",), Dict(
+			"entity_class_name" => old_class)
+		)
+		for pdef in pdefs
+			check_run_request_return_value(run_request(db_url, "call_method", ("add_parameter_definition_item",), Dict(
+				"entity_class_name" => new_class,
+				"name" => pdef["name"],
+				"default_value" => pdef["default_value"],
+				"default_type" => pdef["default_type"],
+				#"parameter_value_list_name" => pdef["parameter_value_list_name"], #does not work
+				"description" => pdef["description"]))
+			)
+		end
+		for entity_item in entity_items
+			# Add entities
+			new_entity_byname = [entity_item["element_name_list"][i] for i in mapping]
+			check_run_request_return_value(run_request(db_url, "call_method", ("add_entity_item",), Dict(
+				"entity_class_name" => new_class, 
+				"entity_byname" => (new_entity_byname),
+				"description" => entity_item["description"]))
+			)
+			for pdef in pdefs
+				for alternative in alternatives
+					pvals = run_request(db_url, "call_method", ("get_parameter_value_item",), Dict(
+						"entity_byname" => (entity_item["element_name_list"]),
+						"entity_class_name" => old_class,
+						"alternative_name" => alternative["name"],
+						"parameter_definition_name" => pdef["name"]
+						)
+					)
+					if length(pvals) > 0
+						check_run_request_return_value(run_request(
+							db_url, "call_method", ("add_parameter_value_item",), Dict(
+							"entity_class_name" => new_class,
+							"entity_byname" => (new_entity_byname),
+							"alternative_name" => alternative["name"],
+							"parameter_definition_name" => pdef["name"],
+							"value" => pvals["value"],
+							"type" => pvals["type"]))
+						)
+					end
+				end
+			end
+		end
+	catch
+		println("Could not update ordering of a multidimensional class.")
+	end
+end
+
+function create_superclasses_and_subclasses(db_url)
+	# Add new classes
+	try
+		check_run_request_return_value(run_request(db_url, "call_method", ("add_entity_class_item",), Dict(
+			"name" => "unit"))
+		)
+		check_run_request_return_value(run_request(db_url, "call_method", ("add_entity_class_item",), Dict(
+			"name" => "node"))
+		)
+		check_run_request_return_value(run_request(db_url, "call_method", ("add_entity_class_item",), Dict(
+			"name" => "unit__to_node", "dimension_name_list" => ["unit", "node"]))
+		)
+		check_run_request_return_value(run_request(db_url, "call_method", ("add_entity_class_item",), Dict(
+			"name" => "node__to_unit", "dimension_name_list" => ["node", "unit"]))
+		)
+ 		check_run_request_return_value(run_request(db_url, "call_method", ("add_entity_class_item",), Dict(
+			"name" => "unit_flow", "dimension_name_list" => ["unit", "node"]))
+		)
+		check_run_request_return_value(run_request(db_url, "call_method", ("add_entity_class_item",), Dict(
+			"name" => "unit_flow__unit_flow", "dimension_name_list" => ["unit_flow", "unit_flow"]))
+		)
+		check_run_request_return_value(run_request(db_url, "call_method", ("add_superclass_subclass_item",), Dict(
+			"superclass_name" => "unit_flow", "subclass_name" => "node__to_unit"))
+		)
+		check_run_request_return_value(run_request(db_url, "call_method", ("add_superclass_subclass_item",), Dict(
+			"superclass_name" => "unit_flow", "subclass_name" => "unit__to_node"))
+		)
+	catch
+		println("Could not add superclasses and subclasses.")
+	end
+end
+
 # Always check the last item
 function check_run_request_return_value(value_to_be_checked)
 	if value_to_be_checked[end] != nothing && value_to_be_checked[end] != ""
@@ -552,11 +791,14 @@ function check_run_request_return_value(value_to_be_checked)
 end
 
 function run_migrations()
+	create_superclasses_and_subclasses(url_out)
 	copy_database(url_in, url_out)
+	update_ordering_of_multidimensional_classes(url_out, classes_to_be_updated)
 	rename_parameters(url_out, parameters_to_be_renamed)
 	transform_parameters_to_maps(url_out, parameters_to_maps)
 	move_parameters_to_other_classes(url_out, parameters_to_other_classes)
 	move_parameters_to_other_classes_and_multiply(url_out, parameter_multiplications)
+	move_parameters_to_multidimensional_classes(url_out, parameters_to_multidimensional_classes)
 end
 
 url_in = ARGS[1]
