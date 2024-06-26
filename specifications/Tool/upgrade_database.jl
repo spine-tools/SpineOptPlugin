@@ -204,7 +204,11 @@ parameters_to_multidimensional_classes = [
 
 # (original class, new class, dimensions, mapping of dimensions)
 classes_to_be_updated = [
-	("unit__from_node", "node__to_unit", ["node", "unit"], [2, 1])
+	("unit__from_node", "node__to_unit", ["node", "unit"], [2, 1]),
+	("unit__from_node__investment_group", "unit_flow__investment_group", ["node", "unit", "investment_group"], [2, 1, 3]),
+	("unit__from_node__user_constraint", "unit_flow__user_constraint", ["node", "unit", "user_constraint"], [2, 1, 3]),
+	("unit__to_node__investment_group", "unit_flow__investment_group", ["unit", "node", "investment_group"], [1, 2, 3]),
+	("unit__to_node__user_constraint", "unit_flow__user_constraint", ["unit", "node", "user_constraint"], [1, 2, 3]),
 ]
 
 # original class
