@@ -4,16 +4,20 @@ using SpineInterface
 parameters_to_be_renamed = [
     (("unit", "number_of_units"), "existing_units", ""),
     (("unit", "unit_availability_factor"), "availability_factor", ""),
-    (("unit", "unit_investment_lifetime"), "lifetime", ""),
-    (("unit", "unit_investment_variable_type"), "investment_method", ""),
+    (("unit", "unit_investment_econ_lifetime"), "econ_lifetime", ""),
+    (("unit", "unit_investment_tech_lifetime"), "tech_lifetime", ""),
+    (("unit", "unit_investment_variable_type"), "investment_variable_type", ""),
 
 	(("node", "balance_type"), "node_type", ""),
 	(("node", "frac_state_loss"), "storage_self_discharge", ""),
 	(("node", "state_coeff"), "storage_state_coeff", ""),
-	(("node", "storage_investment_lifetime"), "storage_lifetime", ""),
+	(("node", "storage_investment_econ_lifetime"), "storage_econ_lifetime", ""),
+	(("node", "storage_investment_tech_lifetime"), "storage_tech_lifetime", ""), 
 
     (("connection", "connection_availability_factor"), "availability_factor", ""),
-    (("connection", "connection_investment_lifetime"), "lifetime", ""),
+    (("connection", "connection_investment_econ_lifetime"), "econ_lifetime", ""),
+    (("connection", "connection_investment_tech_lifetime"), "tech_lifetime", ""),
+    (("connection", "connection_investment_variable_type"), "investment_variable_type", ""),
     (("connection", "connection_reactance"), "reactance", ""),
     (("connection", "connection_resistance"), "resistance", ""),
 
@@ -139,11 +143,11 @@ parameters_to_other_classes = [
 parameter_multiplications = [
 	(("unit", "unit_investment_cost"), 
 		[("unit__to_node", "investment_cost", 1), ("node__to_unit", "investment_cost", 2)],
-		("first", [("unit__to_node", "unit_capacity", 1), ("node__to_unit", "unit_capacity", 2)] )
+		("first", [("unit__to_node", "capacity_per_unit", 1), ("node__to_unit", "capacity_per_unit", 2)] )
 	),
 	(("unit", "units_on_cost"), 
 		[("unit__to_node", "online_cost", 1), ("node__to_unit", "online_cost", 2)],
-		("first", [("unit__to_node", "unit_capacity", 1), ("node__to_unit", "unit_capacity", 2)] )
+		("first", [("unit__to_node", "capacity_per_unit", 1), ("node__to_unit", "capacity_per_unit", 2)] )
 	)
 ]
 
@@ -151,55 +155,55 @@ parameter_multiplications = [
 parameters_to_multidimensional_classes = [
 	# Unit__node1__node2 --> unit__node1, unit__node2 ratios
 	(("unit__node__node", "fix_ratio_out_in_unit_flow"), 
-		("unit_flow__unit_flow", ["unit__to_node", "node__to_unit"], "equality_constraint", [1, 2, 3, 1])),
+		("unit_flow__unit_flow", "equality_constraint", [1, 2, 3, 1])),
 	(("unit__node__node", "fix_ratio_in_out_unit_flow"), 
-		("unit_flow__unit_flow", ["node__to_unit", "unit__to_node"], "equality_constraint", [2, 1, 1, 3])),
+		("unit_flow__unit_flow", "equality_constraint", [2, 1, 1, 3])),
 	(("unit__node__node", "fix_ratio_in_in_unit_flow"), 
-		("unit_flow__unit_flow", ["node__to_unit", "node__to_unit"], "equality_constraint", [2, 1, 3, 1])),
+		("unit_flow__unit_flow", "equality_constraint", [2, 1, 3, 1])),
 	(("unit__node__node", "fix_ratio_out_out_unit_flow"), 
-		("unit_flow__unit_flow", ["unit__to_node", "unit__to_node"], "equality_constraint", [1, 2, 1, 3])),
+		("unit_flow__unit_flow", "equality_constraint", [1, 2, 1, 3])),
 	(("unit__node__node", "min_ratio_out_in_unit_flow"), 
-		("unit_flow__unit_flow", ["unit__to_node", "node__to_unit"], "less_than_constraint", [1, 2, 3, 1])),
+		("unit_flow__unit_flow", "less_than_constraint", [1, 2, 3, 1])),
 	(("unit__node__node", "min_ratio_in_out_unit_flow"), 
-		("unit_flow__unit_flow", ["node__to_unit", "unit__to_node"], "less_than_constraint", [2, 1, 1, 3])),
+		("unit_flow__unit_flow", "less_than_constraint", [2, 1, 1, 3])),
 	(("unit__node__node", "min_ratio_in_in_unit_flow"), 
-		("unit_flow__unit_flow", ["node__to_unit", "node__to_unit"], "less_than_constraint", [2, 1, 3, 1])),
+		("unit_flow__unit_flow", "less_than_constraint", [2, 1, 3, 1])),
 	(("unit__node__node", "min_ratio_out_out_unit_flow"), 
-		("unit_flow__unit_flow", ["unit__to_node", "unit__to_node"], "less_than_constraint", [1, 2, 1, 3])),
+		("unit_flow__unit_flow", "less_than_constraint", [1, 2, 1, 3])),
 	(("unit__node__node", "max_ratio_out_in_unit_flow"), 
-		("unit_flow__unit_flow", ["unit__to_node", "node__to_unit"], "greater_than_constraint", [1, 2, 3, 1])),
+		("unit_flow__unit_flow", "greater_than_constraint", [1, 2, 3, 1])),
 	(("unit__node__node", "max_ratio_in_out_unit_flow"), 
-		("unit_flow__unit_flow", ["node__to_unit", "unit__to_node"], "greater_than_constraint", [2, 1, 1, 3])),
+		("unit_flow__unit_flow", "greater_than_constraint", [2, 1, 1, 3])),
 	(("unit__node__node", "max_ratio_in_in_unit_flow"), 
-		("unit_flow__unit_flow", ["node__to_unit", "node__to_unit"], "greater_than_constraint", [2, 1, 3, 1])),
+		("unit_flow__unit_flow", "greater_than_constraint", [2, 1, 3, 1])),
 	(("unit__node__node", "max_ratio_out_out_unit_flow"), 
-		("unit_flow__unit_flow", ["unit__to_node", "unit__to_node"], "greater_than_constraint", [1, 2, 1, 3])),
+		("unit_flow__unit_flow", "greater_than_constraint", [1, 2, 1, 3])),
 
 	# Unit__node1__node2 --> unit__node1, unit__node2 coefficients
 	(("unit__node__node", "fix_units_on_coefficient_out_in"), 
-		("unit_flow__unit_flow", ["unit__to_node", "node__to_unit"], "equality_constant", [1, 2, 3, 1])),
+		("unit_flow__unit_flow", "equality_constant", [1, 2, 3, 1])),
 	(("unit__node__node", "fix_units_on_coefficient_in_out"), 
-		("unit_flow__unit_flow", ["node__to_unit", "unit__to_node"], "equality_constant", [2, 1, 1, 3])),
+		("unit_flow__unit_flow", "equality_constant", [2, 1, 1, 3])),
 	(("unit__node__node", "fix_units_on_coefficient_in_in"), 
-		("unit_flow__unit_flow", ["node__to_unit", "node__to_unit"], "equality_constant", [2, 1, 3, 1])),
+		("unit_flow__unit_flow", "equality_constant", [2, 1, 3, 1])),
 	(("unit__node__node", "fix_units_on_coefficient_out_out"), 
-		("unit_flow__unit_flow", ["unit__to_node", "unit__to_node"], "equality_constant", [1, 2, 1, 3])),
+		("unit_flow__unit_flow", "equality_constant", [1, 2, 1, 3])),
 	(("unit__node__node", "min_units_on_coefficient_out_in"), 
-		("unit_flow__unit_flow", ["unit__to_node", "node__to_unit"], "less_than_constant", [1, 2, 3, 1])),
+		("unit_flow__unit_flow", "less_than_constant", [1, 2, 3, 1])),
 	(("unit__node__node", "min_units_on_coefficient_in_out"), 
-		("unit_flow__unit_flow", ["node__to_unit", "unit__to_node"], "less_than_constant", [2, 1, 1, 3])),
+		("unit_flow__unit_flow", "less_than_constant", [2, 1, 1, 3])),
 	(("unit__node__node", "min_units_on_coefficient_in_in"), 
-		("unit_flow__unit_flow", ["node__to_unit", "node__to_unit"], "less_than_constant", [2, 1, 3, 1])),
+		("unit_flow__unit_flow", "less_than_constant", [2, 1, 3, 1])),
 	(("unit__node__node", "min_units_on_coefficient_out_out"), 
-		("unit_flow__unit_flow", ["unit__to_node", "unit__to_node"], "less_than_constant", [1, 2, 1, 3])),
+		("unit_flow__unit_flow", "less_than_constant", [1, 2, 1, 3])),
 	(("unit__node__node", "max_units_on_coefficient_out_in"), 
-		("unit_flow__unit_flow", ["unit__to_node", "node__to_unit"], "greater_than_constant", [1, 2, 3, 1])),
+		("unit_flow__unit_flow", "greater_than_constant", [1, 2, 3, 1])),
 	(("unit__node__node", "max_units_on_coefficient_in_out"), 
-		("unit_flow__unit_flow", ["node__to_unit", "unit__to_node"], "greater_than_constant", [2, 1, 1, 3])),
+		("unit_flow__unit_flow", "greater_than_constant", [2, 1, 1, 3])),
 	(("unit__node__node", "max_units_on_coefficient_in_in"), 
-		("unit_flow__unit_flow", ["node__to_unit", "node__to_unit"], "greater_than_constant", [2, 1, 3, 1])),
+		("unit_flow__unit_flow", "greater_than_constant", [2, 1, 3, 1])),
 	(("unit__node__node", "max_units_on_coefficient_out_out"), 
-		("unit_flow__unit_flow", ["unit__to_node", "unit__to_node"], "greater_than_constant", [1, 2, 1, 3]))
+		("unit_flow__unit_flow", "greater_than_constant", [1, 2, 1, 3]))
 ]
 
 # (original class, new class, dimensions, mapping of dimensions)
@@ -239,111 +243,99 @@ function rename_parameter(db_url, class_name, old_par_name, new_par_name, merge_
 	pdef = run_request(db_url, "call_method", ("get_item", "parameter_definition"), Dict(
 		"entity_class_name" => class_name, "name" => old_par_name)
 	)
-	try
-		check_run_request_return_value(run_request(db_url, "call_method", ("update_item", "parameter_definition"), Dict(
-			"id" => pdef["id"], "name" => new_par_name))
-		)
-	catch
-		if merge_method == "sum"
-			sum_to_existing_parameter(db_url, class_name, old_par_name, new_par_name)
+	if length(pdef) > 0
+		try
+			check_run_request_return_value(run_request(db_url, "call_method", ("update_item", "parameter_definition"), Dict(
+				"id" => pdef["id"], "name" => new_par_name))
+			)
+		catch
+			if merge_method == "sum"
+				sum_to_existing_parameter(db_url, class_name, old_par_name, new_par_name)
+			end
+			# Remove old parameter definition
+			check_run_request_return_value(run_request(
+				db_url, "call_method", ("remove_parameter_definition_item", pdef["id"]))
+			)
 		end
-		# Remove old parameter definition
-		pdef = run_request(db_url, "call_method", ("get_parameter_definition_item",), Dict(
-			"entity_class_name" => class_name, "name" => old_par_name)
-		)
-		check_run_request_return_value(run_request(
-			db_url, "call_method", ("remove_parameter_definition_item", pdef["id"]))
-		)
 	end
 end
 
 # Sum old_par_name values to new_par_name values
 function sum_to_existing_parameter(db_url, class_name, old_par_name, new_par_name)
-	entity_items = run_request(db_url, "call_method", ("get_entity_items",), Dict(
-		"entity_class_name" => class_name)
+	# Find old parameters in all entities and alternatives
+	pvals = run_request(db_url, "call_method", ("get_parameter_value_items",), Dict(
+		"entity_class_name" => class_name, "parameter_definition_name" => old_par_name)
 	)
-	alternative_items = run_request(db_url, "call_method", ("get_alternative_items",))
-	for entity in entity_items
-		# Find existing parameters in all alternatives
-		existing_values = find_existing_values(db_url, entity, class_name, new_par_name)
-		for alternative in alternative_items
-			# Get value of the old parameter
-			pval = run_request(db_url, "call_method", ("get_parameter_value_item",), Dict(
-				"entity_class_name" => class_name, "parameter_definition_name" => old_par_name, 
-				"entity_byname" => (entity["element_name_list"]), "alternative_name" => alternative["name"])
-			)
-			if length(pval) > 0
-				parsed_pval = parse_db_value(pval["value"], pval["type"])
-				base_alternative_added = false
-				# Find if entity in existing_values
-				if haskey(existing_values, entity)
-					summed_parsed_pval = parsed_pval
-					# Loop over alternatives in existing_values[entity]
-					for existing_value in existing_values[entity]
-						if existing_value[1] == alternative["name"]
-							alternative_updated = alternative["name"]
-							base_alternative_added = true
-						else
-							# Create a new alternative based on the two and add
-							alternative_updated = string(alternative["name"], "__", existing_value[1])
-							try
-								println("Warning: Creating a new alternative $alternative_updated, add manually to \
-									the scenarios.")
-								check_run_request_return_value(run_request(
-									db_url, "call_method", ("add_alternative_item",), Dict(
-										"name" => alternative_updated)
-									)
+	vals = create_dict_from_parameter_value_items(pvals)
+	# Find existing parameters in all entities and alternatives
+	pvals_existing = run_request(db_url, "call_method", ("get_parameter_value_items",), Dict(
+		"entity_class_name" => class_name, "parameter_definition_name" => new_par_name)
+	)
+	existing_values = create_dict_from_parameter_value_items(pvals_existing)
+	for (entity, val_list) in vals
+		for (alternative, val) in val_list
+			base_alternative_added = false
+			# Find if entity in existing_values
+			if haskey(existing_values, entity)
+				summed_parsed_pval = val
+				# Loop over alternatives in existing_values[entity]
+				for existing_value in existing_values[entity]
+					if existing_value[1] == alternative
+						alternative_updated = alternative
+						base_alternative_added = true
+					else
+						# Create a new alternative based on the two and add
+						alternative_updated = string(alternative, "__", existing_value[1])
+						try
+							println("Warning: Creating a new alternative $alternative_updated, add manually to \
+								the scenarios.")
+							check_run_request_return_value(run_request(
+								db_url, "call_method", ("add_alternative_item",), Dict(
+									"name" => alternative_updated)
 								)
-							catch
-								println("Warning: Could not create alternative $alternative_updated.")
-							end
-						end							
-						summed_parsed_pval += existing_value[2]
-						summed_pval_value, summed_pval_type = unparse_db_value(summed_parsed_pval)
-						# Add the new parameter value into the database
-						check_run_request_return_value(run_request(
-							db_url, "call_method", ("add_update_parameter_value_item",), Dict(
-								"entity_class_name" => class_name, "parameter_definition_name" => new_par_name, 
-								"entity_byname" => (entity["element_name_list"]), 
-								"alternative_name" => alternative_updated, 	
-								"value" => summed_pval_value, "type" => summed_pval_type)
 							)
-						)
-					end
-				end
-				pval_value2, pval_type2 = unparse_db_value(parsed_pval)
-				if !base_alternative_added
+						catch
+							println("Warning: Could not create alternative $alternative_updated.")
+						end
+					end							
+					summed_parsed_pval += existing_value[2]
+					summed_pval_value, summed_pval_type = unparse_db_value(summed_parsed_pval)
 					# Add the new parameter value into the database
 					check_run_request_return_value(run_request(
 						db_url, "call_method", ("add_update_parameter_value_item",), Dict(
 							"entity_class_name" => class_name, "parameter_definition_name" => new_par_name, 
-							"entity_byname" => (entity["element_name_list"]), "alternative_name" => alternative["name"], 
-							"value" => pval_value2, "type" => pval_type2)
+							"entity_byname" => entity, 
+							"alternative_name" => alternative_updated, 	
+							"value" => summed_pval_value, "type" => summed_pval_type)
 						)
 					)
-				end						
+				end
 			end
+			pval_value, pval_type = unparse_db_value(val)
+			if !base_alternative_added
+				# Add the new parameter value into the database
+				check_run_request_return_value(run_request(
+					db_url, "call_method", ("add_update_parameter_value_item",), Dict(
+						"entity_class_name" => class_name, "parameter_definition_name" => new_par_name, 
+						"entity_byname" => entity, "alternative_name" => alternative, 
+						"value" => pval_value, "type" => pval_type)
+					)
+				)
+			end						
 		end
 	end
 end
 
-# Find existing parameter_name values of entity in all alternatives
-function find_existing_values(db_url, entity, class_name, parameter_name)
+# Add parameter values from a parameter value item list to a dictionary
+function create_dict_from_parameter_value_items(pvals)
 	existing_values = Dict()
-	alternative_items = run_request(db_url, "call_method", ("get_alternative_items",))
-	for alternative in alternative_items
-		pval = run_request(db_url, "call_method", ("get_parameter_value_item",), Dict(
-			"entity_class_name" => class_name, "parameter_definition_name" => parameter_name,
-			"entity_byname" => (entity["element_name_list"]), "alternative_name" => alternative["name"])
-		)
-		if length(pval) > 0
-			parsed_value = parse_db_value(pval["value"], pval["type"])
-			if !haskey(existing_values, entity)
-				existing_values[entity] = [(alternative["name"], parsed_value)]
-			else
-				push!(existing_values[entity], (alternative["name"], parsed_value))
-			end
-			break
+	for pval in pvals
+		entity = pval["entity_byname"]
+		parsed_value = parse_db_value(pval["value"], pval["type"])
+		if !haskey(existing_values, entity)
+			existing_values[entity] = [(pval["alternative_name"], parsed_value)]
+		else
+			push!(existing_values[entity], (alternative["name"], parsed_value))
 		end
 	end
 	return existing_values
@@ -366,51 +358,42 @@ function transform_parameter_to_map(db_url, class_name, old_par_name, new_par_na
 		)
 	catch
 	end
-	# Compute new parameter values
-	entity_items = run_request(db_url, "call_method", ("get_entity_items",), Dict(
-		"entity_class_name" => class_name)
+	# Find old parameters in all entities and alternatives
+	pvals = run_request(db_url, "call_method", ("get_parameter_value_items",), Dict(
+		"entity_class_name" => class_name, "parameter_definition_name" => old_par_name)
 	)
-	alternative_items = run_request(db_url, "call_method", ("get_alternative_items",))
-	for entity in entity_items
-		for alternative in alternative_items
+	vals = create_dict_from_parameter_value_items(pvals)
+	for (entity, val_list) in vals
+		for (alternative, val) in val_list
 			indexes = Array{String}(undef, 0)
 			values = Array{Any}(undef, 0)
 			for map_index in map_indexes
-				# Get value of the old parameter
-				pval = run_request(db_url, "call_method", ("get_parameter_value_item",), Dict(
-					"entity_class_name" => class_name, "parameter_definition_name" => old_par_name, 
-					"entity_byname" => (entity["name"],), "alternative_name" => alternative["name"])
-				)
-				if length(pval) > 0
-					# Add index to the array
-					push!(indexes, map_index)
-					# Select the value part, convert it from the DB into a Julia object and add to the array
-					push!(values, parse_db_value(pval["value"], pval["type"]))
-				end
+				# Add index to the array
+				push!(indexes, map_index)
+				# Add the value to the array
+				push!(values, val)
 			end
-			if length(indexes) > 0
-				# Create a map type object based on the indexes and values
-				new_value = Map(indexes, values)
-				# Check if the parameter value already exists and merge if needed
-				pval_existing = run_request(db_url, "call_method", ("get_parameter_value_item",), Dict(
+			# Create a map type object based on the indexes and values
+			new_value = Map(indexes, values)
+			# Check if the parameter value already exists and merge if needed
+			pval_existing = run_request(db_url, "call_method", ("get_parameter_value_item",), Dict(
+				"entity_class_name" => class_name, "parameter_definition_name" => new_par_name, 
+				"entity_byname" => entity, "alternative_name" => alternative)
+			)
+			if length(pval_existing) > 0
+				existing_value = parse_db_value(pval_existing["value"], pval_existing["type"])
+				new_value = merge!(existing_value, new_value)
+			end
+			# Convert the object into a DB representation
+			db_value, db_type = unparse_db_value(new_value)
+			# Add the new map type parameter value into the database
+			check_run_request_return_value(run_request(
+				db_url, "call_method", ("add_update_parameter_value_item",), Dict(
 					"entity_class_name" => class_name, "parameter_definition_name" => new_par_name, 
-					"entity_byname" => (entity["name"],), "alternative_name" => alternative["name"])
+					"entity_byname" => entity, "alternative_name" => alternative, 
+					"value" => db_value, "type" => db_type)
 				)
-				if length(pval_existing) > 0
-					existing_value = parse_db_value(pval_existing["value"], pval_existing["type"])
-					new_value = merge!(existing_value, new_value)
-				end
-				# Convert the object into a DB representation
-				db_value, db_type = unparse_db_value(new_value)
-				# Add the new map type parameter value into the database
-				check_run_request_return_value(run_request(
-					db_url, "call_method", ("add_update_parameter_value_item",), Dict(
-						"entity_class_name" => class_name, "parameter_definition_name" => new_par_name, 
-						"entity_byname" => (entity["name"],), "alternative_name" => alternative["name"], 
-						"value" => db_value, "type" => db_type)
-					)
-				)
-			end
+			)
 		end
 	end
 	# Remove old parameter definition
@@ -450,38 +433,32 @@ function move_parameter_to_another_class(db_url, old_class_name, old_par_name, n
 		)
 	catch
 	end
-	# Compute new parameter values
-	old_entity_items = run_request(db_url, "call_method", ("get_entity_items",), Dict(
-		"entity_class_name" => old_class_name)
+	# Find old parameters in all entities and alternatives
+	pvals = run_request(db_url, "call_method", ("get_parameter_value_items",), Dict(
+		"entity_class_name" => old_class_name, "parameter_definition_name" => old_par_name)
 	)
-	alternative_items = run_request(db_url, "call_method", ("get_alternative_items",))
-	for old_entity in old_entity_items
-		for alternative in alternative_items
-			# Get value of the old parameter
-			pval = run_request(db_url, "call_method", ("get_parameter_value_item",), Dict(
-				"entity_class_name" => old_class_name, "parameter_definition_name" => old_par_name,
-				"entity_byname" => (old_entity["name"],), "alternative_name" => alternative["name"])
-			)
-			if length(pval) > 0
-				# Get the new entities
-				new_entities = find_related_entities(db_url, new_class_name, old_entity, linking_dimension)
-				for new_entity in new_entities
-					# Add the new map type parameter value into the database
-					check_run_request_return_value(run_request(
-						db_url, "call_method", ("add_update_parameter_value_item",), Dict(
-							"entity_class_name" => new_class_name, 
-							"parameter_definition_name" => new_par_name, 
-							"entity_byname" => (new_entity["element_name_list"]), 
-							"alternative_name" => alternative["name"], 
-							"value" => pval["value"], 
-							"type" => pval["type"])
-						)
+	vals = create_dict_from_parameter_value_items(pvals)
+	for (old_entity, val_list) in vals
+		for (alternative, val) in val_list
+			# Get the new entities
+			new_entities = find_related_entities(db_url, new_class_name, old_entity, linking_dimension)
+			for new_entity in new_entities
+				# Convert the object into a DB representation
+				db_value, db_type = unparse_db_value(val)
+				# Add the new map type parameter value into the database
+				check_run_request_return_value(run_request(
+					db_url, "call_method", ("add_update_parameter_value_item",), Dict(
+						"entity_class_name" => new_class_name, 
+						"parameter_definition_name" => new_par_name, 
+						"entity_byname" => (new_entity["element_name_list"]), 
+						"alternative_name" => alternative, 
+						"value" => db_value, 
+						"type" => db_type)
 					)
-				end
+				)
 			end
 		end
 	end
-
 end
 
 
@@ -515,64 +492,56 @@ function move_parameter_to_another_class_and_multiply(db_url, old_class_name, ol
 		)
 	catch
 	end
-	# Compute new parameter values
-	old_entity_items = run_request(db_url, "call_method", ("get_entity_items",), Dict(
-		"entity_class_name" => old_class_name)
+	# Find old parameters in all entities and alternatives
+	pvals = run_request(db_url, "call_method", ("get_parameter_value_items",), Dict(
+		"entity_class_name" => old_class_name, "parameter_definition_name" => old_par_name)
 	)
-	alternative_items = run_request(db_url, "call_method", ("get_alternative_items",))
-	for old_entity in old_entity_items
+	vals = create_dict_from_parameter_value_items(pvals)
+	for (old_entity, val_list) in vals
 		if multiplication_def[1] == "first"
 			multipliers = find_multiplier_first(db_url, old_entity, multiplication_def[2])
 		else
 			break
 		end
-		for alternative in alternative_items
-			# Get value of the old parameter
-			pval = run_request(db_url, "call_method", ("get_parameter_value_item",), Dict(
-				"entity_class_name" => old_class_name, "parameter_definition_name" => old_par_name,
-				"entity_byname" => (old_entity["name"],), "alternative_name" => alternative["name"])
-			)
-			if length(pval) > 0
-				parsed_value = parse_db_value(pval["value"], pval["type"])
-				# Get the new entities
-				new_entities = find_related_entities(db_url, new_class_name, old_entity, linking_dimension)
-				for new_entity in new_entities
-					# Find if (new_class_name, new_entity) in multipliers
-					if haskey(multipliers, (new_class_name, new_entity))
-						# Loop over alternatives in multipliers[(new_class_name, new_entity)]
-						for multiplier in multipliers[(new_class_name, new_entity)]
-							if multiplier[1] == alternative["name"]
-								alternative_updated = alternative["name"]
-							else
-								# Create a new alternative based on the two and add
-								alternative_updated = string(alternative["name"], "__", multiplier[1])
-								try
-									println("Warning: Creating a new alternative $alternative_updated, add manually to \
-										the scenarios.")
-									check_run_request_return_value(run_request(
-										db_url, "call_method", ("add_alternative_item",), Dict(
-											"name" => alternative_updated)
-										)
+		for (alternative, val) in val_list
+			# Get the new entities
+			new_entities = find_related_entities(db_url, new_class_name, old_entity, linking_dimension)
+			for new_entity in new_entities
+				# Find if (new_class_name, new_entity) in multipliers
+				if haskey(multipliers, (new_class_name, new_entity))
+					# Loop over alternatives in multipliers[(new_class_name, new_entity)]
+					for multiplier in multipliers[(new_class_name, new_entity)]
+						if multiplier[1] == alternative
+							alternative_updated = alternative
+						else
+							# Create a new alternative based on the two and add
+							alternative_updated = string(alternative, "__", multiplier[1])
+							try
+								println("Warning: Creating a new alternative $alternative_updated, add manually to \
+									the scenarios.")
+								check_run_request_return_value(run_request(
+									db_url, "call_method", ("add_alternative_item",), Dict(
+										"name" => alternative_updated)
 									)
-								catch
-									println("Warning: Could not create alternative $alternative_updated, alternative \
-										already exists.")
-								end
-							end							
-							new_value = parsed_value * multiplier[2]
-							db_value, db_type = unparse_db_value(new_value)
-							# Add the new parameter value into the database
-							check_run_request_return_value(run_request(
-								db_url, "call_method", ("add_update_parameter_value_item",), Dict(
-									"entity_class_name" => new_class_name, 
-									"parameter_definition_name" => new_par_name, 
-									"entity_byname" => (new_entity["element_name_list"]), 
-									"alternative_name" => alternative_updated, 
-									"value" => db_value, 
-									"type" => db_type)
 								)
+							catch
+								println("Warning: Could not create alternative $alternative_updated, alternative \
+									already exists.")
+							end
+						end							
+						new_value = val * multiplier[2]
+						db_value, db_type = unparse_db_value(new_value)
+						# Add the new parameter value into the database
+						check_run_request_return_value(run_request(
+							db_url, "call_method", ("add_update_parameter_value_item",), Dict(
+								"entity_class_name" => new_class_name, 
+								"parameter_definition_name" => new_par_name, 
+								"entity_byname" => (new_entity["element_name_list"]), 
+								"alternative_name" => alternative_updated, 
+								"value" => db_value, 
+								"type" => db_type)
 							)
-						end
+						)
 					end
 				end
 			end
@@ -619,7 +588,7 @@ function find_related_entities(db_url, class_name, entity_item, linking_dimensio
 		"entity_class_name" => class_name)
 	)
 	for entity in entity_items
-		if entity["element_name_list"][linking_dimension] == entity_item["name"]
+		if entity["element_name_list"][linking_dimension] == entity_item[1]
 			push!(related_entities, entity)
 		end
 	end
@@ -630,7 +599,7 @@ end
 function move_parameters_to_multidimensional_classes(db_url, parameters_to_multidimensional_classes)
 	for (old_par_def, new_par_def) in parameters_to_multidimensional_classes
 		move_parameter_to_multidimensional_class(db_url, old_par_def[1], old_par_def[2], new_par_def[1], 
-			new_par_def[2], new_par_def[3], new_par_def[4]
+			new_par_def[2], new_par_def[3]
 		)
 		# Remove old parameter definition
 		pdef = run_request(db_url, "call_method", ("get_parameter_definition_item",), Dict(
@@ -645,7 +614,7 @@ end
 
 # Find parameter values and move them into another class
 function move_parameter_to_multidimensional_class(db_url, old_class_name, old_par_name, new_class_name, 
-	dimension_name_list, new_par_name, mapping
+	new_par_name, mapping
 )
 	# Add new parameter definition
 	try
@@ -654,44 +623,45 @@ function move_parameter_to_multidimensional_class(db_url, old_class_name, old_pa
 		)
 	catch
 	end
-	# Compute new parameter values
-	old_entity_items = run_request(db_url, "call_method", ("get_entity_items",), Dict(
+	# Find old parameters in all entities and alternatives
+	pvals = run_request(db_url, "call_method", ("get_parameter_value_items",), Dict(
+		"entity_class_name" => old_class_name, "parameter_definition_name" => old_par_name)
+	)
+	vals = create_dict_from_parameter_value_items(pvals)
+	# Find all entities to get entity descriptions
+	entity_items = run_request(db_url, "call_method", ("get_entity_items",), Dict(
 		"entity_class_name" => old_class_name)
 	)
-	alternative_items = run_request(db_url, "call_method", ("get_alternative_items",))
-	for old_entity in old_entity_items
-		for alternative in alternative_items
-			# Get value of the old parameter
-			pval = run_request(db_url, "call_method", ("get_parameter_value_item",), Dict(
-				"entity_class_name" => old_class_name, "parameter_definition_name" => old_par_name,
-				"entity_byname" => (old_entity["element_name_list"]), "alternative_name" => alternative["name"])
+	entities = Dict()
+	for entity_item in entity_items
+		entities[entity_item["element_name_list"]] = entity_item
+	end
+	for (old_entity, val_list) in vals
+		# Determine element name list
+		old_entity_item = entities[old_entity]
+		new_element_name_list = [old_entity[i] for i in mapping]
+		# Add the entity into the database if it is not there already
+		run_request(
+			db_url, "call_method", ("add_entity_item",), Dict(
+				"entity_class_name" => new_class_name, 
+				"entity_byname" => new_element_name_list,
+				"description" => old_entity_item["description"])
+		)
+		for (alternative, val) in val_list
+			db_value, db_type = unparse_db_value(val)
+			# Add the new parameter value into the database
+			check_run_request_return_value(run_request(
+				db_url, "call_method", ("add_update_parameter_value_item",), Dict(
+					"entity_class_name" => new_class_name, 
+					"parameter_definition_name" => new_par_name, 
+					"entity_byname" => new_element_name_list, 
+					"alternative_name" => alternative, 
+					"value" => db_value, 
+					"type" => db_type)
+				)
 			)
-			if length(pval) > 0
-				# Determine element name list
-				new_element_name_list = [old_entity["element_name_list"][i] for i in mapping]
-				# Add the entity into the database
-				check_run_request_return_value(run_request(
-					db_url, "call_method", ("add_entity_item",), Dict(
-						"entity_class_name" => new_class_name, 
-						"entity_byname" => (new_element_name_list),
-						"description" => old_entity["description"])
-					)
-				)
-				# Add the new parameter value into the database
-				check_run_request_return_value(run_request(
-					db_url, "call_method", ("add_update_parameter_value_item",), Dict(
-						"entity_class_name" => new_class_name, 
-						"parameter_definition_name" => new_par_name, 
-						"entity_byname" => (new_element_name_list), 
-						"alternative_name" => alternative["name"], 
-						"value" => pval["value"], 
-						"type" => pval["type"])
-					)
-				)
-			end
 		end
 	end
-
 end
 
 function update_ordering_of_multidimensional_classes(db_url, classes_to_be_updated)
@@ -714,14 +684,12 @@ function update_ordering_of_multidimensional_class(db_url, old_class, new_class,
 		)
 	catch
 	end
-	try
-		# Get entities, alternatives and parameter definitions
-		entity_items = run_request(db_url, "call_method", ("get_entity_items",), Dict("entity_class_name" => old_class))
-		alternatives = run_request(db_url, "call_method", ("get_alternative_items",))
-		pdefs = run_request(db_url, "call_method", ("get_parameter_definition_items",), Dict(
-			"entity_class_name" => old_class)
-		)
-		for pdef in pdefs
+	# Add parameter definitions
+	pdefs = run_request(db_url, "call_method", ("get_parameter_definition_items",), Dict(
+		"entity_class_name" => old_class)
+	)
+	for pdef in pdefs
+		try
 			check_run_request_return_value(run_request(db_url, "call_method", ("add_parameter_definition_item",), Dict(
 				"entity_class_name" => new_class,
 				"name" => pdef["name"],
@@ -730,35 +698,45 @@ function update_ordering_of_multidimensional_class(db_url, old_class, new_class,
 				#"parameter_value_list_name" => pdef["parameter_value_list_name"], #does not work
 				"description" => pdef["description"]))
 			)
+		catch
 		end
+	end
+	try
+		# Add the entity into the database if it is not there already
+		entity_items = run_request(db_url, "call_method", ("get_entity_items",), Dict(
+			"entity_class_name" => old_class)
+		)
+		entities = Dict()
 		for entity_item in entity_items
-			# Add entities
-			new_entity_byname = [entity_item["element_name_list"][i] for i in mapping]
-			check_run_request_return_value(run_request(db_url, "call_method", ("add_entity_item",), Dict(
-				"entity_class_name" => new_class, 
-				"entity_byname" => (new_entity_byname),
-				"description" => entity_item["description"]))
+			new_element_name_list = [entity_item["element_name_list"][i] for i in mapping]
+			check_run_request_return_value(run_request(
+				db_url, "call_method", ("add_entity_item",), Dict(
+					"entity_class_name" => new_class, 
+					"entity_byname" => new_element_name_list,
+					"description" => entity_item["description"])
+			))
+			entities[entity_item["element_name_list"]] = entity_item
+		end
+		for pdef in pdefs
+			# Find old parameters in all entities and alternatives
+			pvals = run_request(db_url, "call_method", ("get_parameter_value_items",), Dict(
+				"entity_class_name" => old_class, "parameter_definition_name" => pdef["name"])
 			)
-			for pdef in pdefs
-				for alternative in alternatives
-					pvals = run_request(db_url, "call_method", ("get_parameter_value_item",), Dict(
-						"entity_byname" => (entity_item["element_name_list"]),
-						"entity_class_name" => old_class,
-						"alternative_name" => alternative["name"],
-						"parameter_definition_name" => pdef["name"]
-						)
+			vals = create_dict_from_parameter_value_items(pvals)
+			for (old_entity, val_list) in vals
+				# Determine element name list
+				new_element_name_list = [old_entity[i] for i in mapping]
+				for (alternative, val) in val_list
+					db_value, db_type = unparse_db_value(val)
+					check_run_request_return_value(run_request(
+						db_url, "call_method", ("add_parameter_value_item",), Dict(
+						"entity_class_name" => new_class,
+						"entity_byname" => new_element_name_list,
+						"alternative_name" => alternative,
+						"parameter_definition_name" => pdef["name"],
+						"value" => db_value,
+						"type" => db_type))
 					)
-					if length(pvals) > 0
-						check_run_request_return_value(run_request(
-							db_url, "call_method", ("add_parameter_value_item",), Dict(
-							"entity_class_name" => new_class,
-							"entity_byname" => (new_entity_byname),
-							"alternative_name" => alternative["name"],
-							"parameter_definition_name" => pdef["name"],
-							"value" => pvals["value"],
-							"type" => pvals["type"]))
-						)
-					end
 				end
 			end
 		end
