@@ -2,125 +2,186 @@ using SpineInterface
 
 # (original class, original parameter name), new parameter name, merge method("sum")
 parameters_to_be_renamed = [
+	# unit
     (("unit", "number_of_units"), "existing_units", ""),
+	# unit availability and outages
+    (("unit", "fix_units_out_of_service"), "out_of_service_count_fix", ""),	
+    (("unit", "initial_units_out_of_service"), "out_of_service_count_initial", ""),
+    (("unit", "scheduled_outage_duration"), "outage_scheduled_duration", ""),
     (("unit", "unit_availability_factor"), "availability_factor", ""),
-    (("unit", "unit_investment_econ_lifetime"), "econ_lifetime", ""),
-    (("unit", "unit_investment_tech_lifetime"), "tech_lifetime", ""),
+    (("unit", "units_unavailable"), "out_of_service_count_fix", "sum"),
+	# unit online
+	(("unit", "fix_units_on"), "online_count_fix", ""),
+	(("unit", "initial_units_on"), "online_count_initial", ""),
+	# unit installing and decommissioning
+    (("unit", "unit_decommissioning_time"), "decommissioning_time", ""),
+    (("unit", "unit_discount_rate_technology_specific"), "discount_rate_technology_specific", ""),
+    (("unit", "unit_investment_econ_lifetime"), "lifetime_econ", ""),
+    (("unit", "unit_investment_tech_lifetime"), "lifetime_tech", ""),
+    (("unit", "unit_investment_lifetime_sense"), "lifetime_constraint_sense", ""),
     (("unit", "unit_investment_variable_type"), "investment_variable_type", ""),
+    (("unit", "unit_lead_time"), "lead_time", ""),
+	# unit investment limits
+	(("unit", "candidate_units"), "investment_count_max_cumulative", ""),
+	(("unit", "fix_units_invested"), "investment_count_fix_new", ""),
+	(("unit", "fix_units_invested_available"), "investment_count_fix_cumulative", ""),
+	(("unit", "initial_units_invested"), "investment_count_initial_new", ""),
+	(("unit", "initial_units_invested_available"), "investment_count_initial_cumulative", ""),
+	# unit mga
+	(("unit", "units_invested_big_m_mga"), "mga_investment_big_m", ""),
+	(("unit", "units_invested_mga"), "mga_investment_activate", ""),
+	(("unit", "units_invested_mga_weight"), "mga_investment_weight", ""),
 
+	# node
 	(("node", "balance_type"), "node_type", ""),
+	(("node", "fractional_demand"), "demand_fraction", ""), 
+	(("node", "min_capacity_margin"), "capacity_margin_min", ""), 
+	(("node", "min_capacity_margin_penalty"), "capacity_margin_penalty", ""), 
+	(("node", "nodal_balance_sense"), "node_balance_sense", ""), 
+	(("node", "node_slack_penalty"), "node_balance_penalty", ""), 
+	# node storage other parameters
 	(("node", "frac_state_loss"), "storage_self_discharge", ""),
+	(("node", "number_of_storages"), "existing_storages", ""), 
 	(("node", "state_coeff"), "storage_state_coeff", ""),
-	(("node", "storage_investment_econ_lifetime"), "storage_econ_lifetime", ""),
-	(("node", "storage_investment_tech_lifetime"), "storage_tech_lifetime", ""), 
+	(("node", "storage_fom_cost"), "storage_fixed_annual_cost", ""), 
+	# node storage limits
+	(("node", "fix_node_state"), "storage_state_fix", ""),
+	(("node", "initial_node_state"), "storage_state_initial", ""),
+	(("node", "node_state_cap"), "storage_state_max", ""),
+	(("node", "node_state_min"), "storage_state_min", ""),
+	# node pressure limits
+	(("node", "fix_node_pressure"), "pressure_fix", ""),
+	(("node", "initial_node_pressure"), "pressure_initial", ""),
+	(("node", "max_node_pressure"), "pressure_max", ""),
+	(("node", "min_node_pressure"), "pressure_min", ""),
+	# node voltage angle limits
+	(("node", "fix_node_voltage_angle"), "voltage_angle_fix", ""),
+	(("node", "initial_node_voltage_angle"), "voltage_angle_initial", ""),
+	(("node", "max_voltage_angle"), "voltage_angle_max", ""),
+	(("node", "min_voltage_angle"), "voltage_angle_min", ""),
+	# node storage installing and decommissioning
+	(("node", "storage_investment_econ_lifetime"), "storage_lifetime_econ", ""),
+	(("node", "storage_investment_tech_lifetime"), "storage_lifetime_tech", ""), 
+	(("node", "storage_investment_lifetime_sense"), "storage_lifetime_constraint_sense", ""), 
+	# node storage investment limits
+	(("node", "candidate_storages"), "storage_investment_count_max_cumulative", ""),
+	(("node", "fix_storages_invested"), "storage_investment_count_fix_new", ""),
+	(("node", "fix_storages_invested_available"), "storage_investment_count_fix_cumulative", ""),
+	(("node", "initial_storages_invested"), "storage_investment_count_initial_new", ""),
+	(("node", "initial_storages_invested_available"), "storage_investment_count_initial_cumulative", ""),
+	# node storage mga
+	(("node", "storages_invested_big_m_mga"), "mga_storage_investment_big_m", ""),
+	(("node", "storages_invested_mga"), "mga_storage_investment_activate", ""),
+	(("node", "storages_invested_mga_weight"), "mga_storage_investment_weight", ""),
 
+	# connection
     (("connection", "connection_availability_factor"), "availability_factor", ""),
-    (("connection", "connection_investment_econ_lifetime"), "econ_lifetime", ""),
-    (("connection", "connection_investment_tech_lifetime"), "tech_lifetime", ""),
-    (("connection", "connection_investment_variable_type"), "investment_variable_type", ""),
+    (("connection", "connection_contingency"), "contingency_activate", ""),
+    (("connection", "connection_monitored"), "monitoring_activate", ""),
     (("connection", "connection_reactance"), "reactance", ""),
+    (("connection", "connection_reactance_base"), "reactance_base", ""),
     (("connection", "connection_resistance"), "resistance", ""),
+    (("connection", "number_of_connections"), "existing_connections", ""),
+	# connection installing and decommissioning
+    (("connection", "connection_decommissioning_cost"), "decommissioning_cost", ""),
+    (("connection", "connection_decommissioning_time"), "decommissioning_time", ""),
+    (("connection", "connection_discount_rate_technology_specific"), "discount_rate_technology_specific", ""),
+    (("connection", "connection_investment_cost"), "investment_cost", ""),
+    (("connection", "connection_investment_econ_lifetime"), "lifetime_econ", ""),
+    (("connection", "connection_investment_lifetime_sense"), "lifetime_constraint_sense", ""),
+    (("connection", "connection_investment_tech_lifetime"), "lifetime_tech", ""),
+    (("connection", "connection_investment_variable_type"), "investment_variable_type", ""),
+    (("connection", "connection_lead_time"), "lead_time", ""),
+	# connection investment limits
+	(("connection", "candidate_connections"), "investment_count_max_cumulative", ""),
+	(("connection", "fix_connections_invested"), "investment_count_fix_new", ""),
+	(("connection", "fix_connections_invested_available"), "investment_count_fix_cumulative", ""),
+	(("connection", "initial_connections_invested"), "investment_count_initial_new", ""),
+	(("connection", "initial_connections_invested_available"), "investment_count_initial_cumulative", ""),
+	# connection mga
+	(("connection", "connections_invested_big_m_mga"), "mga_investment_big_m", ""),
+	(("connection", "connections_invested_mga"), "mga_investment_activate", ""),
+	(("connection", "connections_invested_mga_weight"), "mga_investment_weight", ""),
 
+	# unit_flow: unit__to_node
+	(("unit__to_node", "minimum_operating_point"), "min_operating_point", ""),
+	(("unit__to_node", "ordered_unit_flow_op"), "piecewise_linear_flow_ordering_activate", ""),
 	(("unit__to_node", "unit_capacity"), "capacity_per_unit", ""),
 	(("unit__to_node", "vom_cost"), "flow_cost", ""),
+	(("unit__to_node", "fuel_cost"), "flow_cost", "sum"),
+	# unit_flow flow limits
+	(("unit__to_node", "fix_unit_flow"), "flow_fix", ""),
+	(("unit__to_node", "fix_unit_flow_op"), "piecewise_linear_flow_fix", ""),
+	(("unit__to_node", "initial_unit_flow"), "flow_initial", ""),
+	(("unit__to_node", "initial_unit_flow_op"), "piecewise_linear_flow_initial", ""),
+	(("unit__to_node", "max_total_cumulated_unit_flow_to_node"), "flow_max_cumulative", ""),
+	(("unit__to_node", "min_total_cumulated_unit_flow_to_node"), "flow_min_cumulative", ""),
+	(("unit__to_node", "min_unit_flow"), "flow_min", ""),
+	# unit_flow ramp limits
+	(("unit__to_node", "ramp_down_limit"), "ramp_limit_ramp_down", ""),
+	(("unit__to_node", "ramp_up_limit"), "ramp_limit_ramp_up", ""),
+	(("unit__to_node", "shut_down_limit"), "ramp_limit_shutdown", ""),
+	(("unit__to_node", "start_up_limit"), "ramp_limit_startup", ""),
+
+	# unit_flow: node__to_unit
+	(("node__to_unit", "minimum_operating_point"), "min_operating_point", ""),
+	(("node__to_unit", "ordered_unit_flow_op"), "piecewise_linear_flow_ordering_activate", ""),
 	(("node__to_unit", "unit_capacity"), "capacity_per_unit", ""),
 	(("node__to_unit", "vom_cost"), "flow_cost", ""),
-
-	(("unit__to_node", "fuel_cost"), "flow_cost", "sum"),
 	(("node__to_unit", "fuel_cost"), "flow_cost", "sum"),
+	# unit_flow flow limits
+	(("node__to_unit", "fix_unit_flow"), "flow_fix", ""),
+	(("node__to_unit", "fix_unit_flow_op"), "piecewise_linear_flow_fix", ""),
+	(("node__to_unit", "initial_unit_flow"), "flow_initial", ""),
+	(("node__to_unit", "initial_unit_flow_op"), "piecewise_linear_flow_initial", ""),
+	(("node__to_unit", "max_total_cumulated_unit_flow_from_node"), "flow_max_cumulative", ""),
+	(("node__to_unit", "min_total_cumulated_unit_flow_from_node"), "flow_min_cumulative", ""),
+	(("node__to_unit", "min_unit_flow"), "flow_min", ""),
+	# unit_flow ramp limits	
+	(("node__to_unit", "ramp_down_limit"), "ramp_limit_ramp_down", ""),
+	(("node__to_unit", "ramp_up_limit"), "ramp_limit_ramp_up", ""),
+	(("node__to_unit", "shut_down_limit"), "ramp_limit_shutdown", ""),
+	(("node__to_unit", "start_up_limit"), "ramp_limit_startup", ""),
 	
-	(("temporal_block", "representative_periods_mapping"), "periods_represented", ""),
+	# commodity
+	(("commodity", "commodity_lodf_tolerance"), "lodf_tolerance", ""),
+	(("commodity", "commodity_physics"), "physics_type", ""),
+	(("commodity", "commodity_physics_duration"), "physics_duration", ""),
+	(("commodity", "commodity_ptdf_tolerance"), "ptdf_tolerance", ""),
 
-	(("model", "db_lp_solver"), "lp_solver", ""),
-	(("model", "db_lp_solver_options"), "lp_solver_options", ""),
-	(("model", "db_mip_solver"), "mip_solver", ""),
-	(("model", "db_mip_solver_options"), "mip_solver_options", ""),
-]
-
-# (original class, original parameter name), (new parameter name, [map indexes of new parameter])
-parameters_to_maps = [
-	# Unit investments
-	(("unit", "candidate_units"), ("investment_limits", ["max_new"])),
-    (("unit", "fix_units_invested"), ("investment_limits", ["fix_new"])),
-	(("unit", "fix_units_invested_available"), ("investment_limits", ["fix_cumulative"])),
-	(("unit", "initial_units_invested"), ("investment_limits", ["initial_new"])),
-	(("unit", "initial_units_invested_available"), ("investment_limits", ["initial_cumulative"])),
-
-	# Unit online
-    (("unit", "fix_units_on"), ("units_online", ["min", "max"])),
-    (("unit", "initial_units_on"), ("units_online", ["initial"])),
-
-	# Unit mga
-	(("unit", "units_invested_big_m_mga"), ("mga", ["investment_big_m"])),
-	(("unit", "units_invested_mga"), ("mga", ["investment"])),
-	(("unit", "units_invested_mga_weight"), ("mga", ["investment_weight"])),
-
-	# Node investments
-	(("node", "candidate_storages"), ("storage_investment_limits", ["max_new"])),
-	(("node", "fix_storages_invested"), ("storage_investment_limits", ["fix_new"])),
-	(("node", "fix_storages_invested_available"), ("storage_investment_limits", ["fix_cumulative"])),
-	(("node", "initial_storages_invested"), ("storage_investment_limits", ["initial_new"])),
-	(("node", "initial_storages_invested_available"), ("storage_investment_limits", ["initial_cumulative"])),
-
-	# Node limits
-	(("node", "fix_node_pressure"), ("pressure_limits", ["fix"])),
-	(("node", "fix_node_state"), ("storage_state_limits", ["fix"])),
-	(("node", "fix_node_voltage_angle"), ("voltage_angle_limits", ["fix"])),
-	(("node", "initial_node_pressure"), ("pressure_limits", ["initial"])),
-	(("node", "initial_node_state"), ("storage_state_limits", ["initial"])),
-	(("node", "initial_node_voltage_angle"), ("voltage_angle_limits", ["initial"])),
-	(("node", "max_node_pressure"), ("pressure_limits", ["max"])),
-	(("node", "max_voltage_angle"), ("voltage_angle_limits", ["max"])),
-	(("node", "min_node_pressure"), ("pressure_limits", ["min"])),
-	(("node", "min_voltage_angle"), ("voltage_angle_limits", ["min"])),
-	(("node", "node_state_cap"), ("storage_state_limits", ["max"])),
-	(("node", "node_state_min"), ("storage_state_limits", ["min"])),
-
-	# Node mga
-	(("node", "storages_invested_big_m_mga"), ("storage_mga", ["investment_big_m"])),
-	(("node", "storages_invested_mga"), ("storage_mga", ["investment"])),
-	(("node", "storages_invested_mga_weight"), ("storage_mga", ["investment_weight"])),
-
-	# Connection investments
-	(("connection", "candidate_connections"), ("investment_limits", ["max_new"])),
-	(("connection", "fix_connections_invested"), ("investment_limits", ["fix_new"])),
-	(("connection", "fix_connections_invested_available"), ("investment_limits", ["fix_cumulative"])),
-	(("connection", "initial_connections_invested"), ("investment_limits", ["initial_new"])),
-	(("connection", "initial_connections_invested_available"), ("investment_limits", ["initial_cumulative"])),
-
-	# Connection mga
-	(("connection", "connections_invested_big_m_mga"), ("mga", ["investment_big_m"])),
-	(("connection", "connections_invested_mga"), ("mga", ["investment"])),
-	(("connection", "connections_invested_mga_weight"), ("mga", ["investment_weight"])),
-
-	# Unit__to_node
-	(("unit__to_node", "fix_unit_flow"), ("flow_limits", ["fix"])),
-	(("unit__to_node", "initial_unit_flow"), ("flow_limits", ["initial"])),
-	(("unit__to_node", "max_total_cumulated_unit_flow_to_node"), ("flow_limits", ["max_cumulative"])),
-	(("unit__to_node", "min_total_cumulated_unit_flow_to_node"), ("flow_limits", ["min_cumulative"])),
-	(("unit__to_node", "min_unit_flow"), ("flow_limits", ["min"])),
-	(("unit__to_node", "ramp_down_limit"), ("ramp_limits", ["ramp_down"])),
-	(("unit__to_node", "ramp_up_limit"), ("ramp_limits", ["ramp_up"])),
-	(("unit__to_node", "shut_down_limit"), ("ramp_limits", ["shutdown"])),
-	(("unit__to_node", "start_up_limit"), ("ramp_limits", ["startup"])),
-
-	# node__to_unit
-	(("node__to_unit", "fix_unit_flow"), ("flow_limits", ["fix"])),
-	(("node__to_unit", "initial_unit_flow"), ("flow_limits", ["initial"])),
-	(("node__to_unit", "max_total_cumulated_unit_flow_from_node"), ("flow_limits", ["max_cumulative"])),
-	(("node__to_unit", "min_total_cumulated_unit_flow_from_node"), ("flow_limits", ["min_cumulative"])),
-	(("node__to_unit", "min_unit_flow"), ("flow_limits", ["min"])),
-	(("node__to_unit", "ramp_down_limit"), ("ramp_limits", ["ramp_down"])),
-	(("node__to_unit", "ramp_up_limit"), ("ramp_limits", ["ramp_up"])),
-	(("node__to_unit", "shut_down_limit"), ("ramp_limits", ["shutdown"])),
-	(("node__to_unit", "start_up_limit"), ("ramp_limits", ["startup"])),
+	# investment_group
+	(("investment_group", "equal_investments"), "equal_investments_activate", ""),
+	(("investment_group", "maximum_capacity_invested_available"), "investment_capacity_max_cumulative", ""),
+	(("investment_group", "maximum_entities_invested_available"), "investment_count_max_cumulative", ""),
+	(("investment_group", "minimum_capacity_invested_available"), "investment_capacity_min_cumulative", ""),
+	(("investment_group", "minimum_entities_invested_available"), "investment_count_min_cumulative", ""),
 
 	# model
-	(("model", "max_gap"), ("decomposition", ["max_gap"])),
-	(("model", "max_iterations"), ("decomposition", ["max_iterations"])),
-	(("model", "max_mga_iterations"), ("mga", ["max_iterations"])),
-	(("model", "max_mga_slack"), ("mga", ["max_slack"])),
-	(("model", "min_iterations"), ("decomposition", ["min_iterations"])),
+	(("model", "db_lp_solver"), "solver_lp", ""),
+	(("model", "db_lp_solver_options"), "solver_lp_options", ""),
+	(("model", "db_mip_solver"), "solver_mip", ""),
+	(("model", "db_mip_solver_options"), "solver_mip_options", ""),
+	(("model", "max_gap"), "decomposition_max_gap", ""),
+	(("model", "max_iterations"), "decomposition_max_iterations", ""),
+	(("model", "max_mga_iterations"), "mga_max_iterations", ""),
+	(("model", "max_mga_slack"), "mga_max_slack", ""),
+	(("model", "min_iterations"), "decomposition_min_iterations", ""),
+	(("model", "use_connection_intact_flow"), "connection_investment_impact_activate", ""),
+	(("model", "use_economic_representation"), "economic_representation_activate", ""),
+	(("model", "use_milestone_years"), "milestone_years_activate", ""),
+	(("model", "use_tight_compact_formulations"), "tight_compact_formulations_activate", ""),
+
+	# node__node
+	(("node__node", "diff_coeff"), "diffusion_coefficient", ""),
+
+	# temporal_block
+	(("temporal_block", "representative_periods_mapping"), "period_to_representative_block", ""),
+]
+
+
+# original class, new class
+classes_to_be_renamed = [
+	("commodity", "grid")
 ]
 
 # (original class, original parameter name), [(new class, new parameter name, linking dimension)]
@@ -148,6 +209,10 @@ parameter_multiplications = [
 	(("unit", "units_on_cost"), 
 		[("unit__to_node", "online_cost", 1), ("node__to_unit", "online_cost", 2)],
 		("first", [("unit__to_node", "capacity_per_unit", 1), ("node__to_unit", "capacity_per_unit", 2)] )
+	),
+	(("unit", "unit_decommissioning_cost"), 
+		[("unit__to_node", "decommissioning_cost", 1), ("node__to_unit", "decommissioning_cost", 2)],
+		("first", [("unit__to_node", "capacity_per_unit", 1), ("node__to_unit", "capacity_per_unit", 2)] )
 	)
 ]
 
@@ -155,55 +220,55 @@ parameter_multiplications = [
 parameters_to_multidimensional_classes = [
 	# Unit__node1__node2 --> unit__node1, unit__node2 ratios
 	(("unit__node__node", "fix_ratio_out_in_unit_flow"), 
-		("unit_flow__unit_flow", "equality_constraint", [1, 2, 3, 1])),
+		("unit_flow__unit_flow", "constraint_equality_ratio", [1, 2, 3, 1])),
 	(("unit__node__node", "fix_ratio_in_out_unit_flow"), 
-		("unit_flow__unit_flow", "equality_constraint", [2, 1, 1, 3])),
+		("unit_flow__unit_flow", "constraint_equality_ratio", [2, 1, 1, 3])),
 	(("unit__node__node", "fix_ratio_in_in_unit_flow"), 
-		("unit_flow__unit_flow", "equality_constraint", [2, 1, 3, 1])),
+		("unit_flow__unit_flow", "constraint_equality_ratio", [2, 1, 3, 1])),
 	(("unit__node__node", "fix_ratio_out_out_unit_flow"), 
-		("unit_flow__unit_flow", "equality_constraint", [1, 2, 1, 3])),
+		("unit_flow__unit_flow", "constraint_equality_ratio", [1, 2, 1, 3])),
 	(("unit__node__node", "min_ratio_out_in_unit_flow"), 
-		("unit_flow__unit_flow", "less_than_constraint", [1, 2, 3, 1])),
+		("unit_flow__unit_flow", "constraint_less_than_ratio", [1, 2, 3, 1])),
 	(("unit__node__node", "min_ratio_in_out_unit_flow"), 
-		("unit_flow__unit_flow", "less_than_constraint", [2, 1, 1, 3])),
+		("unit_flow__unit_flow", "constraint_less_than_ratio", [2, 1, 1, 3])),
 	(("unit__node__node", "min_ratio_in_in_unit_flow"), 
-		("unit_flow__unit_flow", "less_than_constraint", [2, 1, 3, 1])),
+		("unit_flow__unit_flow", "constraint_less_than_ratio", [2, 1, 3, 1])),
 	(("unit__node__node", "min_ratio_out_out_unit_flow"), 
-		("unit_flow__unit_flow", "less_than_constraint", [1, 2, 1, 3])),
+		("unit_flow__unit_flow", "constraint_less_than_ratio", [1, 2, 1, 3])),
 	(("unit__node__node", "max_ratio_out_in_unit_flow"), 
-		("unit_flow__unit_flow", "greater_than_constraint", [1, 2, 3, 1])),
+		("unit_flow__unit_flow", "constraint_greater_than_ratio", [1, 2, 3, 1])),
 	(("unit__node__node", "max_ratio_in_out_unit_flow"), 
-		("unit_flow__unit_flow", "greater_than_constraint", [2, 1, 1, 3])),
+		("unit_flow__unit_flow", "constraint_greater_than_ratio", [2, 1, 1, 3])),
 	(("unit__node__node", "max_ratio_in_in_unit_flow"), 
-		("unit_flow__unit_flow", "greater_than_constraint", [2, 1, 3, 1])),
+		("unit_flow__unit_flow", "constraint_greater_than_ratio", [2, 1, 3, 1])),
 	(("unit__node__node", "max_ratio_out_out_unit_flow"), 
-		("unit_flow__unit_flow", "greater_than_constraint", [1, 2, 1, 3])),
+		("unit_flow__unit_flow", "constraint_greater_than_ratio", [1, 2, 1, 3])),
 
 	# Unit__node1__node2 --> unit__node1, unit__node2 coefficients
 	(("unit__node__node", "fix_units_on_coefficient_out_in"), 
-		("unit_flow__unit_flow", "equality_constant", [1, 2, 3, 1])),
+		("unit_flow__unit_flow", "constraint_equality_constant", [1, 2, 3, 1])),
 	(("unit__node__node", "fix_units_on_coefficient_in_out"), 
-		("unit_flow__unit_flow", "equality_constant", [2, 1, 1, 3])),
+		("unit_flow__unit_flow", "constraint_equality_constant", [2, 1, 1, 3])),
 	(("unit__node__node", "fix_units_on_coefficient_in_in"), 
-		("unit_flow__unit_flow", "equality_constant", [2, 1, 3, 1])),
+		("unit_flow__unit_flow", "constraint_equality_constant", [2, 1, 3, 1])),
 	(("unit__node__node", "fix_units_on_coefficient_out_out"), 
-		("unit_flow__unit_flow", "equality_constant", [1, 2, 1, 3])),
+		("unit_flow__unit_flow", "constraint_equality_constant", [1, 2, 1, 3])),
 	(("unit__node__node", "min_units_on_coefficient_out_in"), 
-		("unit_flow__unit_flow", "less_than_constant", [1, 2, 3, 1])),
+		("unit_flow__unit_flow", "constraint_less_than_constant", [1, 2, 3, 1])),
 	(("unit__node__node", "min_units_on_coefficient_in_out"), 
-		("unit_flow__unit_flow", "less_than_constant", [2, 1, 1, 3])),
+		("unit_flow__unit_flow", "constraint_less_than_constant", [2, 1, 1, 3])),
 	(("unit__node__node", "min_units_on_coefficient_in_in"), 
-		("unit_flow__unit_flow", "less_than_constant", [2, 1, 3, 1])),
+		("unit_flow__unit_flow", "constraint_less_than_constant", [2, 1, 3, 1])),
 	(("unit__node__node", "min_units_on_coefficient_out_out"), 
-		("unit_flow__unit_flow", "less_than_constant", [1, 2, 1, 3])),
+		("unit_flow__unit_flow", "constraint_less_than_constant", [1, 2, 1, 3])),
 	(("unit__node__node", "max_units_on_coefficient_out_in"), 
-		("unit_flow__unit_flow", "greater_than_constant", [1, 2, 3, 1])),
+		("unit_flow__unit_flow", "constraint_greater_than_constant", [1, 2, 3, 1])),
 	(("unit__node__node", "max_units_on_coefficient_in_out"), 
-		("unit_flow__unit_flow", "greater_than_constant", [2, 1, 1, 3])),
+		("unit_flow__unit_flow", "constraint_greater_than_constant", [2, 1, 1, 3])),
 	(("unit__node__node", "max_units_on_coefficient_in_in"), 
-		("unit_flow__unit_flow", "greater_than_constant", [2, 1, 3, 1])),
+		("unit_flow__unit_flow", "constraint_greater_than_constant", [2, 1, 3, 1])),
 	(("unit__node__node", "max_units_on_coefficient_out_out"), 
-		("unit_flow__unit_flow", "greater_than_constant", [1, 2, 1, 3]))
+		("unit_flow__unit_flow", "constraint_greater_than_constant", [1, 2, 1, 3]))
 ]
 
 # (original class, new class, dimensions, mapping of dimensions)
@@ -228,7 +293,6 @@ function copy_database(url_in, url_out)
 	data = export_data(url_in)
 	import_data(url_out, data, "Imported data from an old SpineOpt database.")
 end
-
 
 # Go through the parameters, rename them and commit session
 function rename_parameters(db_url, parameters_to_be_renamed)
@@ -333,6 +397,21 @@ function create_dict_from_parameter_value_items(db_url, pvals)
 	return existing_values
 end
 
+# Go through the classes, rename them and commit session
+function rename_classes(db_url, classes_to_be_renamed)
+	for (old_class_name, new_class_name) in classes_to_be_renamed
+		class_item = run_request(db_url, "call_method", ("get_item", "entity_class"), Dict(
+			"name" => old_class_name)
+		)
+		if length(class_item) > 0
+			check_run_request_return_value(run_request(db_url, "call_method", ("update_item", "entity_class"), Dict(
+				"id" => class_item["id"], "name" => new_class_name))
+			)
+		end
+	end
+	run_request(db_url, "call_method", ("commit_session", "Rename classes."))
+end
+
 # Go through the parameters, convert to a Map parameter and commit session
 function transform_parameters_to_maps(db_url, parameters_to_maps)
 	for (old_par_def, new_par_def) in parameters_to_maps
@@ -407,17 +486,18 @@ function move_parameters_to_other_classes(db_url, parameters_to_other_classes)
 		pdef = run_request(db_url, "call_method", ("get_parameter_definition_item",), Dict(
 			"entity_class_name" => old_par_def[1], "name" => old_par_def[2])
 		)
-		check_run_request_return_value(run_request(
-			db_url, "call_method", ("remove_parameter_definition_item", pdef["id"]))
-		)
+		if length(pdef) > 0
+			check_run_request_return_value(run_request(
+				db_url, "call_method", ("remove_parameter_definition_item", pdef["id"]))
+			)
+		end
 	end
 	run_request(db_url, "call_method", ("commit_session", "Move parameters to other classes."))
 end
 
 # Find parameter values and move them into another class
 function move_parameter_to_another_class(db_url, old_class_name, old_par_name, new_class_name, new_par_name, 
-	linking_dimension
-)
+	linking_dimension)
 	# Add new parameter definition
 	try
 		check_run_request_return_value(run_request(db_url, "call_method", ("add_parameter_definition_item",), Dict(
@@ -453,7 +533,6 @@ function move_parameter_to_another_class(db_url, old_class_name, old_par_name, n
 	end
 end
 
-
 # Go through the parameters, move to other classes while multiplying and commit session
 function move_parameters_to_other_classes_and_multiply(db_url, parameters_to_other_classes)
 	for (old_par_def, new_par_def, multiplication_def) in parameters_to_other_classes
@@ -466,17 +545,18 @@ function move_parameters_to_other_classes_and_multiply(db_url, parameters_to_oth
 		pdef = run_request(db_url, "call_method", ("get_parameter_definition_item",), Dict(
 			"entity_class_name" => old_par_def[1], "name" => old_par_def[2])
 		)
-		check_run_request_return_value(run_request(
-			db_url, "call_method", ("remove_parameter_definition_item", pdef["id"]))
-		)
+		if length(pdef) > 0
+			check_run_request_return_value(run_request(
+				db_url, "call_method", ("remove_parameter_definition_item", pdef["id"]))
+			)
+		end
 	end
 	run_request(db_url, "call_method", ("commit_session", "Move parameters to other classes while multiplying."))
 end
 
 # Find parameter values and move them into another class while multiplying
 function move_parameter_to_another_class_and_multiply(db_url, old_class_name, old_par_name, new_class_name, 
-	new_par_name, linking_dimension, multiplication_def
-)
+	new_par_name, linking_dimension, multiplication_def)
 	# Add new parameter definition
 	try
 		check_run_request_return_value(run_request(db_url, "call_method", ("add_parameter_definition_item",), Dict(
@@ -550,15 +630,19 @@ function move_parameter_to_another_class_and_multiply(db_url, old_class_name, ol
 	end
 end
 
-
+# For each alternative, find the first value of related entities' specific set of parameters
+# (take the multiplicative inverse)
 function find_multiplier_first(db_url, entity_item, multiplier_items, vals)
 	multipliers = Dict()
 	added_alternatives = Array{String}(undef, 0)
+	# For each class in multiplier_items, find the items where entity_item is in the correct position	
 	for multiplier_item in multiplier_items
 		related_entities = find_related_entities(db_url, multiplier_item[1], entity_item, multiplier_item[3])
+		# Go through the items, check if they have the correct parameter
 		for related_entity in related_entities
 			if haskey(vals, related_entity["element_name_list"])
 				val_list = vals[related_entity["element_name_list"]]
+				# Go through the parameter alternatives and add to multipliers if the same alternative is not yet there
 				for (alternative_name, val) in val_list
 					if !(alternative_name in added_alternatives)
 						if !haskey(multipliers, (multiplier_item[1], related_entity))
@@ -599,17 +683,18 @@ function move_parameters_to_multidimensional_classes(db_url, parameters_to_multi
 		pdef = run_request(db_url, "call_method", ("get_parameter_definition_item",), Dict(
 			"entity_class_name" => old_par_def[1], "name" => old_par_def[2])
 		)
-		check_run_request_return_value(run_request(
-			db_url, "call_method", ("remove_parameter_definition_item", pdef["id"]))
-		)
+		if length(pdef) > 0
+			check_run_request_return_value(run_request(
+				db_url, "call_method", ("remove_parameter_definition_item", pdef["id"]))
+			)
+		end
 	end
 	run_request(db_url, "call_method", ("commit_session", "Move parameters to other classes."))
 end
 
 # Find parameter values and move them into another class
 function move_parameter_to_multidimensional_class(db_url, old_class_name, old_par_name, new_class_name, 
-	new_par_name, mapping
-)
+	new_par_name, mapping)
 	# Add new parameter definition
 	try
 		check_run_request_return_value(run_request(db_url, "call_method", ("add_parameter_definition_item",), Dict(
@@ -658,6 +743,7 @@ function move_parameter_to_multidimensional_class(db_url, old_class_name, old_pa
 	end
 end
 
+# Go through the classes, update ordering of their dimensions and commit session
 function update_ordering_of_multidimensional_classes(db_url, classes_to_be_updated)
 	for (old_class, new_class, dimensions, mapping) in classes_to_be_updated
 		update_ordering_of_multidimensional_class(db_url, old_class, new_class, dimensions, mapping)
@@ -670,6 +756,7 @@ function update_ordering_of_multidimensional_classes(db_url, classes_to_be_updat
 	run_request(db_url, "call_method", ("commit_session", "Update classes."))
 end
 
+# Update ordering of class dimensions, add as a new class
 function update_ordering_of_multidimensional_class(db_url, old_class, new_class, dimensions, mapping)
 	try
 		# Create new class
@@ -689,7 +776,7 @@ function update_ordering_of_multidimensional_class(db_url, old_class, new_class,
 				"name" => pdef["name"],
 				"default_value" => pdef["default_value"],
 				"default_type" => pdef["default_type"],
-				#"parameter_value_list_name" => pdef["parameter_value_list_name"], #does not work
+				"parameter_value_list_name" => pdef["parameter_value_list_name"],
 				"description" => pdef["description"]))
 			)
 		catch
@@ -739,6 +826,7 @@ function update_ordering_of_multidimensional_class(db_url, old_class, new_class,
 	end
 end
 
+# Remove classes and commit session
 function remove_classes(db_url, classes_to_be_removed)
 	for class_name in classes_to_be_removed
 		try
@@ -755,6 +843,7 @@ function remove_classes(db_url, classes_to_be_removed)
 	run_request(db_url, "call_method", ("commit_session", "Remove classes."))
 end
 
+# Create specific new classes as superclasses and subclasses
 function create_superclasses_and_subclasses(db_url)
 	# Add new classes
 	try
@@ -889,9 +978,11 @@ function merge_has_state_and_balance_type_parameters(db_url)
 	pdef = run_request(db_url, "call_method", ("get_parameter_definition_item",), Dict(
 		"entity_class_name" => "node", "name" => "has_state")
 	)
-	check_run_request_return_value(run_request(
-		db_url, "call_method", ("remove_parameter_definition_item", pdef["id"]))
-	)
+	if length(pdef) > 0
+		check_run_request_return_value(run_request(
+			db_url, "call_method", ("remove_parameter_definition_item", pdef["id"]))
+		)
+	end
 	run_request(db_url, "call_method", ("commit_session", "Merged has_state and balance_type."))
 end
 
@@ -941,8 +1032,10 @@ function run_migrations()
 	update_ordering_of_multidimensional_classes(url_out, classes_to_be_updated)
 	println("Renaming parameters")
 	rename_parameters(url_out, parameters_to_be_renamed)
-	println("Transforming parameters to maps")
-	transform_parameters_to_maps(url_out, parameters_to_maps)
+	println("Renaming classes")
+	rename_classes(url_out, classes_to_be_renamed)
+	#println("Transforming parameters to maps")
+	#transform_parameters_to_maps(url_out, parameters_to_maps)
 	println("Moving parameters to other classes")
 	move_parameters_to_other_classes(url_out, parameters_to_other_classes)
 	println("Scaling parameters and moving to other classes")
