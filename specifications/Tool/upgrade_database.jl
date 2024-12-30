@@ -189,13 +189,6 @@ parameters_to_other_classes = [
 	# Unit --> unit__to_node / node__to_unit
 	(("unit", "curtailment_cost"), 
 		[("unit__to_node", "curtailment_cost", 1), ("node__to_unit", "curtailment_cost", 2)]),
-	(("unit", "fom_cost"), 
-		[("unit__to_node", "fixed_annual_cost", 1), ("node__to_unit", "fixed_annual_cost", 2)]),
-	(("unit", "shut_down_cost"), 
-		[("unit__to_node", "shutdown_cost", 1), ("node__to_unit", "shutdown_cost", 2)]),
-	(("unit", "start_up_cost"), 
-		[("unit__to_node", "startup_cost", 1), ("node__to_unit", "startup_cost", 2)])
-
 ]
 
 # (original class, original parameter name),
@@ -213,6 +206,14 @@ parameter_multiplications = [
 	(("unit", "unit_decommissioning_cost"), 
 		[("unit__to_node", "decommissioning_cost", 1), ("node__to_unit", "decommissioning_cost", 2)],
 		("first", [("unit__to_node", "capacity_per_unit", 1), ("node__to_unit", "capacity_per_unit", 2)] )
+	),
+	(("unit", "shut_down_cost"), 
+		[("unit__to_node", "shutdown_cost", 1), ("node__to_unit", "shutdown_cost", 2)],
+		("first", [("unit__to_node", "capacity_per_unit", 1), ("node__to_unit", "capacity_per_unit", 2)] )
+	),
+	(("unit", "start_up_cost"), 
+		[("unit__to_node", "startup_cost", 1), ("node__to_unit", "startup_cost", 2)],
+		("first", [("unit__to_node", "capacity_per_unit", 1), ("node__to_unit", "capacity_per_unit", 2)] )
 	)
 ]
 
@@ -220,55 +221,55 @@ parameter_multiplications = [
 parameters_to_multidimensional_classes = [
 	# Unit__node1__node2 --> unit__node1, unit__node2 ratios
 	(("unit__node__node", "fix_ratio_out_in_unit_flow"), 
-		("unit_flow__unit_flow", "constraint_equality_ratio", [1, 2, 3, 1])),
+		("unit_flow__unit_flow", "constraint_equality_flow_ratio", [1, 2, 3, 1])),
 	(("unit__node__node", "fix_ratio_in_out_unit_flow"), 
-		("unit_flow__unit_flow", "constraint_equality_ratio", [2, 1, 1, 3])),
+		("unit_flow__unit_flow", "constraint_equality_flow_ratio", [2, 1, 1, 3])),
 	(("unit__node__node", "fix_ratio_in_in_unit_flow"), 
-		("unit_flow__unit_flow", "constraint_equality_ratio", [2, 1, 3, 1])),
+		("unit_flow__unit_flow", "constraint_equality_flow_ratio", [2, 1, 3, 1])),
 	(("unit__node__node", "fix_ratio_out_out_unit_flow"), 
-		("unit_flow__unit_flow", "constraint_equality_ratio", [1, 2, 1, 3])),
+		("unit_flow__unit_flow", "constraint_equality_flow_ratio", [1, 2, 1, 3])),
 	(("unit__node__node", "min_ratio_out_in_unit_flow"), 
-		("unit_flow__unit_flow", "constraint_less_than_ratio", [1, 2, 3, 1])),
+		("unit_flow__unit_flow", "constraint_less_than_flow_ratio", [1, 2, 3, 1])),
 	(("unit__node__node", "min_ratio_in_out_unit_flow"), 
-		("unit_flow__unit_flow", "constraint_less_than_ratio", [2, 1, 1, 3])),
+		("unit_flow__unit_flow", "constraint_less_than_flow_ratio", [2, 1, 1, 3])),
 	(("unit__node__node", "min_ratio_in_in_unit_flow"), 
-		("unit_flow__unit_flow", "constraint_less_than_ratio", [2, 1, 3, 1])),
+		("unit_flow__unit_flow", "constraint_less_than_flow_ratio", [2, 1, 3, 1])),
 	(("unit__node__node", "min_ratio_out_out_unit_flow"), 
-		("unit_flow__unit_flow", "constraint_less_than_ratio", [1, 2, 1, 3])),
+		("unit_flow__unit_flow", "constraint_less_than_flow_ratio", [1, 2, 1, 3])),
 	(("unit__node__node", "max_ratio_out_in_unit_flow"), 
-		("unit_flow__unit_flow", "constraint_greater_than_ratio", [1, 2, 3, 1])),
+		("unit_flow__unit_flow", "constraint_greater_than_flow_ratio", [1, 2, 3, 1])),
 	(("unit__node__node", "max_ratio_in_out_unit_flow"), 
-		("unit_flow__unit_flow", "constraint_greater_than_ratio", [2, 1, 1, 3])),
+		("unit_flow__unit_flow", "constraint_greater_than_flow_ratio", [2, 1, 1, 3])),
 	(("unit__node__node", "max_ratio_in_in_unit_flow"), 
-		("unit_flow__unit_flow", "constraint_greater_than_ratio", [2, 1, 3, 1])),
+		("unit_flow__unit_flow", "constraint_greater_than_flow_ratio", [2, 1, 3, 1])),
 	(("unit__node__node", "max_ratio_out_out_unit_flow"), 
-		("unit_flow__unit_flow", "constraint_greater_than_ratio", [1, 2, 1, 3])),
+		("unit_flow__unit_flow", "constraint_greater_than_flow_ratio", [1, 2, 1, 3])),
 
 	# Unit__node1__node2 --> unit__node1, unit__node2 coefficients
 	(("unit__node__node", "fix_units_on_coefficient_out_in"), 
-		("unit_flow__unit_flow", "constraint_equality_constant", [1, 2, 3, 1])),
+		("unit_flow__unit_flow", "constraint_equality_online_coefficient", [1, 2, 3, 1])),
 	(("unit__node__node", "fix_units_on_coefficient_in_out"), 
-		("unit_flow__unit_flow", "constraint_equality_constant", [2, 1, 1, 3])),
+		("unit_flow__unit_flow", "constraint_equality_online_coefficient", [2, 1, 1, 3])),
 	(("unit__node__node", "fix_units_on_coefficient_in_in"), 
-		("unit_flow__unit_flow", "constraint_equality_constant", [2, 1, 3, 1])),
+		("unit_flow__unit_flow", "constraint_equality_online_coefficient", [2, 1, 3, 1])),
 	(("unit__node__node", "fix_units_on_coefficient_out_out"), 
-		("unit_flow__unit_flow", "constraint_equality_constant", [1, 2, 1, 3])),
+		("unit_flow__unit_flow", "constraint_equality_online_coefficient", [1, 2, 1, 3])),
 	(("unit__node__node", "min_units_on_coefficient_out_in"), 
-		("unit_flow__unit_flow", "constraint_less_than_constant", [1, 2, 3, 1])),
+		("unit_flow__unit_flow", "constraint_less_than_online_coefficient", [1, 2, 3, 1])),
 	(("unit__node__node", "min_units_on_coefficient_in_out"), 
-		("unit_flow__unit_flow", "constraint_less_than_constant", [2, 1, 1, 3])),
+		("unit_flow__unit_flow", "constraint_less_than_online_coefficient", [2, 1, 1, 3])),
 	(("unit__node__node", "min_units_on_coefficient_in_in"), 
-		("unit_flow__unit_flow", "constraint_less_than_constant", [2, 1, 3, 1])),
+		("unit_flow__unit_flow", "constraint_less_than_online_coefficient", [2, 1, 3, 1])),
 	(("unit__node__node", "min_units_on_coefficient_out_out"), 
-		("unit_flow__unit_flow", "constraint_less_than_constant", [1, 2, 1, 3])),
+		("unit_flow__unit_flow", "constraint_less_than_online_coefficient", [1, 2, 1, 3])),
 	(("unit__node__node", "max_units_on_coefficient_out_in"), 
-		("unit_flow__unit_flow", "constraint_greater_than_constant", [1, 2, 3, 1])),
+		("unit_flow__unit_flow", "constraint_greater_than_online_coefficient", [1, 2, 3, 1])),
 	(("unit__node__node", "max_units_on_coefficient_in_out"), 
-		("unit_flow__unit_flow", "constraint_greater_than_constant", [2, 1, 1, 3])),
+		("unit_flow__unit_flow", "constraint_greater_than_online_coefficient", [2, 1, 1, 3])),
 	(("unit__node__node", "max_units_on_coefficient_in_in"), 
-		("unit_flow__unit_flow", "constraint_greater_than_constant", [2, 1, 3, 1])),
+		("unit_flow__unit_flow", "constraint_greater_than_online_coefficient", [2, 1, 3, 1])),
 	(("unit__node__node", "max_units_on_coefficient_out_out"), 
-		("unit_flow__unit_flow", "constraint_greater_than_constant", [1, 2, 1, 3]))
+		("unit_flow__unit_flow", "constraint_greater_than_online_coefficient", [1, 2, 1, 3]))
 ]
 
 # (original class, new class, dimensions, mapping of dimensions)
@@ -377,7 +378,7 @@ end
 
 # Add parameter values from a parameter value item list to a dictionary
 function create_dict_from_parameter_value_items(db_url, pvals)
-	existing_values = Dict()
+	existing_values = Dict{Any, Vector{Tuple{Any, Any}}}()
 	for pval in pvals
 		entity = pval["entity_byname"]
 		if pval["type"] == "list_value_ref"
@@ -1011,6 +1012,181 @@ function add_merged_alternative(db_url, alternative_name_1, alternative_name_2)
 	return alternative_updated, alternatives_the_same
 end
 
+function rename_variable_type_list(db_url)
+	name_mapping = Dict(
+		"unit_online_variable_type_binary" => "variable_type_binary",
+		"unit_online_variable_type_integer" => "variable_type_integer",
+		"unit_online_variable_type_linear" => "variable_type_linear",
+		"unit_online_variable_type_none" => "variable_type_none"
+	)
+	# Update parameter value list item names based on the mapping
+	list_value_items = run_request(db_url, "call_method", ("get_list_value_items",), Dict(
+		"parameter_value_list_name" => "unit_online_variable_type_list")
+	)
+	for list_value_item in list_value_items
+		old_name = parse_db_value(list_value_item["value"], list_value_item["type"])
+		new_name_value, new_name_type = unparse_db_value(name_mapping[old_name])
+		check_run_request_return_value(run_request(
+			db_url, "call_method", ("update_list_value_item",), Dict(
+				"id" => list_value_item["id"], "value" => new_name_value, "type" => new_name_type))
+		)
+	end
+	# Rename the parameter value list
+	pval_list_item = run_request(db_url, "call_method", ("get_parameter_value_list_item",), Dict(
+		"name" => "unit_online_variable_type_list")
+	)
+	check_run_request_return_value(run_request(
+		db_url, "call_method", ("update_parameter_value_list_item",), Dict(
+			"id" => pval_list_item["id"], "name" => "variable_type_list"))
+	)
+end
+
+function merge_variable_type_lists(db_url)
+	rename_variable_type_list(db_url)
+	lists_to_be_updated = (
+		("connection", "investment_count_max_cumulative", "variable_type_list", 
+		   "investment_variable_type", "investment_variable_type2", "connection_investment_variable_type_list"),
+		("node", "storage_investment_count_max_cumulative", "variable_type_list", 
+		   "storage_investment_variable_type", "investment_variable_type2", "storage_investment_variable_type_list"),
+		("unit", "investment_count_max_cumulative", "variable_type_list", 
+		   "investment_variable_type", "investment_variable_type2", "unit_investment_variable_type_list")
+	)
+	for (class_name, max_cum_par_name, type_list, old_par_name, temp_par_name, list_old) in lists_to_be_updated
+		# Add new parameter for investment variable type, connect to value list
+		try
+			check_run_request_return_value(run_request(db_url, "call_method", ("add_parameter_definition_item",), Dict(
+				"entity_class_name" => class_name, "name" => temp_par_name, 
+				"parameter_value_list_name" => type_list))
+			)
+		catch
+		end
+		# Get investment_count_max_cumulative and old investment_variable_type parameter values
+		pvals = run_request(db_url, "call_method", ("get_parameter_value_items",), Dict(
+			"entity_class_name" => class_name, "parameter_definition_name" => max_cum_par_name)
+		)
+		vals_max = create_dict_from_parameter_value_items(db_url, pvals)
+		pvals = run_request(db_url, "call_method", ("get_parameter_value_items",), Dict(
+			"entity_class_name" => class_name, "parameter_definition_name" => old_par_name)
+		)
+		vals_type = create_dict_from_parameter_value_items(db_url, pvals)
+		# Old default: if there is investment_count_max_cumulative, new investment variable is variable_type_continuous
+		# (or none if investment_count_max_cumulative set to none)
+		for (entity, val_list) in vals_max
+			for (alternative, val) in val_list
+				if isnothing(val)
+					pval = "variable_type_none"
+				else
+					pval = "variable_type_linear"
+				end
+				pval_value, pval_type = unparse_db_value(pval)
+				# Add the new parameter value into the database
+				check_run_request_return_value(run_request(
+					db_url, "call_method", ("add_update_parameter_value_item",), Dict(
+						"entity_class_name" => class_name, "parameter_definition_name" => temp_par_name, 
+						"entity_byname" => entity, 
+						"alternative_name" => alternative, 	
+						"value" => pval_value, "type" => pval_type)
+					)
+				)
+			end
+		end
+		# If investment_count_max_cumulative is specified, it overrides the old default
+		for (entity, val_list) in vals_type
+			for (alternative, val) in val_list
+				if occursin("integer", val)
+					pval = "variable_type_integer"
+				else
+					pval = "variable_type_linear"
+				end
+				pval_value, pval_type = unparse_db_value(pval)
+				# Add the new parameter value into the database
+				check_run_request_return_value(run_request(
+					db_url, "call_method", ("add_update_parameter_value_item",), Dict(
+						"entity_class_name" => class_name, "parameter_definition_name" => temp_par_name, 
+						"entity_byname" => entity, 
+						"alternative_name" => alternative, 	
+						"value" => pval_value, "type" => pval_type)
+					)
+				)
+			end
+		end
+		# Merged alternatives are created for those investment_variable_types that don't have 
+		# investment_count_max_cumulative directly associated to them
+		pvals_existing = run_request(db_url, "call_method", ("get_parameter_value_items",), Dict(
+			"entity_class_name" => class_name, "parameter_definition_name" => max_cum_par_name)
+		)
+		existing_values = create_dict_from_parameter_value_items(db_url, pvals_existing)
+		existing_types = Dict()
+		for (entity, val_list) in vals_type
+			for (alternative, val) in val_list
+				existing_types[(entity, alternative)] = val
+			end
+		end
+		existing_values2 = Dict()
+		for (entity, val_list) in existing_values
+			for (alternative, val) in val_list
+				existing_values2[(entity, alternative)] = val
+			end
+		end
+		for (entity, val_list) in vals_type
+			for (alternative, val) in val_list
+				# Find if entity in existing_values
+				if !haskey(existing_values2, (entity, alternative))
+					# Loop over alternatives in existing_values[entity]
+					for existing_value in existing_values[entity]
+						if !haskey(existing_types, (entity, existing_value[1]))
+							alternative_updated, base_alternative_added = add_merged_alternative(
+								db_url, alternative, existing_value[1]
+							)
+							if occursin("integer", val)
+								pval = "variable_type_integer"
+							else
+								pval = "variable_type_linear"
+							end
+							pval_value, pval_type = unparse_db_value(pval)
+							# Add the new parameter value into the database
+							check_run_request_return_value(run_request(
+								db_url, "call_method", ("add_update_parameter_value_item",), Dict(
+									"entity_class_name" => class_name, "parameter_definition_name" => temp_par_name, 
+									"entity_byname" => entity, 
+									"alternative_name" => alternative_updated, 	
+									"value" => pval_value, "type" => pval_type)
+								)
+							)
+						end
+					end
+				end			
+			end
+		end
+		# Remove old parameter definition and list
+		pdef = run_request(db_url, "call_method", ("get_parameter_definition_item",), Dict(
+			"entity_class_name" => class_name, "name" => old_par_name)
+		)
+		if length(pdef) > 0
+			check_run_request_return_value(run_request(
+				db_url, "call_method", ("remove_parameter_definition_item", pdef["id"]))
+			)
+		end
+		# Remove old parameter definition
+		pval_list = run_request(db_url, "call_method", ("get_parameter_value_list_item",), Dict("name" => list_old))
+		println(pval_list)
+		if length(pval_list) > 0
+			check_run_request_return_value(run_request(
+				db_url, "call_method", ("remove_parameter_value_list_item", pval_list["id"]))
+			)
+		end
+		# Rename the parameter
+		pdef = run_request(db_url, "call_method", ("get_parameter_definition_item",), Dict(
+			"entity_class_name" => class_name, "name" => temp_par_name)
+		)
+		check_run_request_return_value(run_request(
+			db_url, "call_method", ("update_parameter_definition_item",), Dict(
+				"id" => pdef["id"], "name" => old_par_name))
+		)
+	end
+	run_request(db_url, "call_method", ("commit_session", "Merged variable type lists."))
+end
+
 # Always check the last item
 function check_run_request_return_value(value_to_be_checked, print_value=false)
 	if value_to_be_checked[end] != nothing && value_to_be_checked[end] != ""
@@ -1044,6 +1220,8 @@ function run_migrations()
 	move_parameters_to_multidimensional_classes(url_out, parameters_to_multidimensional_classes)
 	println("Removing classes")
 	remove_classes(url_out, classes_to_be_removed)
+	println("Merging variable type lists")
+	merge_variable_type_lists(url_out)
 end
 
 url_in = ARGS[1]
