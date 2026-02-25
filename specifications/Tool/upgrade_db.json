@@ -1,0 +1,13 @@
+{
+    "name": "Upgrade database",
+    "tooltype": "julia",
+    "includes": [
+        "upgrade_db.jl"
+    ],
+    "description": "Runs the SpineOpt database upgrade script to attempt and migrate the database structure to its latest version.",
+    "inputfiles": [],
+    "inputfiles_opt": [],
+    "outputfiles": [],
+    "cmdline_args": [],
+    "includes_main_path": "."
+}
